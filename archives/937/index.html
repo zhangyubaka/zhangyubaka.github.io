@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/937/"><title>macOS 静态编译 · 云羽的羽毛</title>            <meta name="description" content="那自然是缺少 ibc 了，去编译一个静态 ibc 即可;ibsysem_kerne.a 和 ibc.a 可以在 hps://gihub.com/ibsysem-ehan/esdarwin 中找到;但是天无绝人之路，这个 QA 之中也留了一条退路">
+            <meta name="keywords" content="libc,crt,MacOSX,然后,我们,就是,XNU,make,直接,根据">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">macOS 静态编译</h1><div class="post-info">Aug 17, 2017</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="2017922-更新"><a class="markdownIt-Anchor" href="#2017922-更新"></a> 2017.9.22 更新</h2>
+<p>libsystem_kernel.a 和 libc.a 可以在 <a href="https://github.com/libsystem-ethan/esdarwin" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/libsystem-ethan/esdarwin</a> 中找到。</p>
+<p>然后还是感觉缺了什么…</p>
+<p>根据苹果的一个 QA<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top-right hint--error hint--large" aria-label="https://developer.apple.com/library/content/qa/qa1118/_index.html
+">[1]</span></a></sup>， Mac OS X 不支持静态链接。</p>
+<p><img src="https://ww2.sinaimg.cn/large/006tNbRwly1ffoqnyj5q0j30v606kq8t.jpg" alt="ld"></p>
+<p>但是天无绝人之路，这个 QA 之中也留了一条退路。</p>
+<blockquote>
+<p>If your project absolutely must create a statically linked binary, you can get the Csu (C startup) module from Darwin and try building crt0.o for yourself.</p>
+</blockquote>
+<p>那么 Csu 是什么？直接去 <a href="https://opensource.apple.com" rel="external nofollow noopener noreferrer" target="_blank">https://opensource.apple.com</a> 找，点进系统版本号就找到啦。</p>
+<p>地址是 <a href="https://opensource.apple.com/tarballs/Csu/Csu-85.tar.gz" rel="external nofollow noopener noreferrer" target="_blank">https://opensource.apple.com/tarballs/Csu/Csu-85.tar.gz</a></p>
+<p>然后把它拖下来，很小。根据 Skaht 的研究，你需要 MacOSX.sdk 才可以编译（装个 Xcode 的事情），同时需要指定头文件的位置。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">make ARCH_CFLAGS=-I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include</span><br></pre></td></tr></table></figure>
+<p>然后就生成了 <code>crt0.o</code> <code>crt.1.v*.o</code> <code>dylib1.v*.o</code> <code>gcrt1.o</code> <code>lazydylib1.o</code></p>
+<p>我们可以不 make install, 直接暴力把他们塞到 <code>/usr/local/lib</code></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">install *.o -c /usr/<span class="built_in">local</span>/lib</span><br></pre></td></tr></table></figure>
+<p>然后这个时候 ld 的错误消息就是无法找到 <code>_exit</code> 等 C 函数了，证明我们还缺少一些东西。</p>
+<p>那自然是缺少 libc 了，去编译一个静态 libc 即可。</p>
+<p>macOS 10.12 对应的 libc 居然砍掉了 pthreads 的源码，于是就编译不了了。这里我选择回滚到 libc-825.40.1.</p>
+<p>为了编译 libc，还需要补全 libc 的依赖。</p>
+<p>需要 libplatform libdispatch libmalloc AvailabilityVersions libinfo <sup id="fnref:2"><a href="#fn:2" rel="footnote"><span class="hint--top-right hint--error hint--large" aria-label="https://github.com/PureDarwin/Building-XNU-16.7-Kernel-Guide
+">[2]</span></a></sup></p>
+<p>要做的就是把缺的 header 补回去就可以了，缺什么补什么。我们需要构建的是 libc static/libc.a。</p>
+<p>构建完成之后继续测试. 接下来 ld 抛出的错误就是 vm_map vm_protect 等 syscall。</p>
+<p>然后就进入了构建 XNU 内核的时候，这里跳到 XNU 内核的教程就好了， libsyscall 是 XNU 的一部分（？</p>
+<p>然后羽毛就卡在这里了…</p>
+<p>其实最简单的办法是等 PureDarwin 的 SDK 释出就好了…那个 SDK 里面一应俱全.</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">https://developer.apple.com/library/content/qa/qa1118/_index.html<a href="#fnref:1" rev="footnote"> ↩</a></span></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">2.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">https://github.com/PureDarwin/Building-XNU-16.7-Kernel-Guide<a href="#fnref:2" rev="footnote"> ↩</a></span></li></ol></div></div><br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/938/" class="prev">上一篇</a><a href="/archives/935/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/937/';
+var disqus_title = 'macOS 静态编译';
+var disqus_url = 'https://oao.moe/archives/937/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

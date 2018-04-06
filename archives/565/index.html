@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/565/"><title>用 Softether 打穿 NAT · 云羽的羽毛</title>            <meta name="description" content="Did you agree he License Agreemen ?;NAT,网络地址转换.在我发现我的 IP 变成 10.127.x.x 之后,事情就很明朗了,我在 NAT 后面了.;这里我们采用一个非常简单而又粗暴的方式来打穿 NAT,Sofeher.">
+            <meta name="keywords" content="NAT,我们,一个,然后,you,the,License,Agreement,sysctl,amp">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">用 Softether 打穿 NAT</h1><div class="post-info">May 22, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>NAT,网络地址转换.在我发现我的 IP 变成 10.127.x.x 之后,事情就很明朗了,我在 NAT 后面了.</p>
+<p>CMCC 也是很放肆啊,动不动就把人丢到 NAT 后面.</p>
+<p>这里我们采用一个非常简单而又粗暴的方式来打穿 NAT,Softether.</p>
+<p>首先你要有一个暴露在外网的服务器.然后我们编译安装源码.</p>
+<pre><code>echo &quot;net.ipv4.ip_forward = 1&quot; &gt;&gt; /etc/sysctl.conf &amp;&amp; sysctl --system
+wget http://www.softether-download.com/files/softether/v4.21-9613-beta-2016.04.24-tree/Linux/SoftEther_VPN_Server/64bit_-_Intel_x64_or_AMD64/softether-vpnserver-v4.21-9613-beta-2016.04.24-linux-x64-64bit.tar.gz
+tar xf softether-vpnserver-v4.21-9613-beta-2016.04.24-linux-x64-64bit.tar.gz
+cd vpnserver
+make
+</code></pre>
+<p>然后他会问你几个问题.</p>
+<pre><code>Do you want to read the License Agreement for this software ?
+1
+Did you read and understand the License Agreement ?
+1
+Did you agree the License Agreement ?
+1
+</code></pre>
+<p>PS:一定要读哦.</p>
+<p>然后我们就可以把它挪到一个我们认为可以的地方.比如 /usr/local</p>
+<pre><code>cd ..
+mv vpnserver /usr/local
+cd /usr/local/vpnserver/
+</code></pre>
+<p>同时加上权限,别都加 777</p>
+<pre><code>chmod 600 *
+chmod 700 vpnserver
+chmod 700 vpncmd
+</code></pre>
+<p>接下来需要更改密码并创建一个 NAT —别担心,这个 NAT 是我们的.</p>
+<pre><code>./vpnserver start
+./vpncmd
+1    #Management of VPN Server or VPN Bridge
+#Enter 两次.若更改了端口则在地址处输入 localhost:5555
+ServerPasswordSet
+#输入密码.
+</code></pre>
+<p>如果你的 443 被占用了的话,在这一步可能会出错,在 vpn_server.config 中将 443 改为 5555 并连接即可.</p>
+<pre><code>HubCreate VPN
+Hub VPN
+SecureNatEnable
+</code></pre>
+<p>接下来我们创建用户.</p>
+<pre><code>UserCreate baka
+UserPasswordSet baka
+</code></pre>
+<p>打开 L2TP.</p>
+<pre><code>IPsecEnable
+</code></pre>
+<p>然后我们需要一个证书,Let’s Encrypt 的证书都有吧.</p>
+<pre><code>ServerCertGet ~/cert.cer
+SstpEnable yes    #打开 SSTP
+</code></pre>
+<p>OK,这样就可以了.连上 Softether,接下来就直接用 iptables 来 forward 到机子上就可以了.</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/572/" class="prev">上一篇</a><a href="/archives/561/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/565/';
+var disqus_title = '用 Softether 打穿 NAT';
+var disqus_url = 'https://oao.moe/archives/565/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

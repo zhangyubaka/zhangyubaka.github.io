@@ -1,0 +1,28 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/812/"><title>fallocate 与 dd · 云羽的羽毛</title>            <meta name="description" content="这两个命令都可以创建文件, 尤其是大文件.那么都有什么区别呢?;其中很多人都注意到 dd 慢一点.;faocae - 1G 1G  0.00s user 0.00s sysem 0 cpu 0.006 oa">
+            <meta name="keywords" content="cpu,mkfile,total,区别,fallocate,0.00,user,system,文件,那么">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">fallocate 与 dd</h1><div class="post-info">Nov 20, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="fallocate-与-dd"><a class="markdownIt-Anchor" href="#fallocate-与-dd"></a> fallocate 与 dd</h1>
+<p>这两个命令都可以创建文件, 尤其是大文件.那么都有什么区别呢?</p>
+<p>其中很多人都注意到 dd 慢一点.</p>
+<pre><code>➜  ~ time fallocate -l 1G 1G
+fallocate -l 1G 1G  0.00s user 0.00s system 0% cpu 0.006 total
+
+➜  ~ time dd if=/dev/zero of=1G bs=128M count=8
+8+0 records in
+8+0 records out
+1073741824 bytes (1.1 GB, 1.0 GiB) copied, 2.45113 s, 438 MB/s
+dd if=/dev/zero of=1G bs=128M count=8  0.00s user 1.15s system 46% cpu 2.456 total
+</code></pre>
+<p>同时 dd 如果 bs 给的过大会直接爆掉内存.</p>
+<p>那么区别呢?区别在于 fallocate 是一个 System call,由文件系统支持, 其创建的是一个稀疏文件, 或者说预分配空间.实际上没有写入实际数据, 而 dd 则是真的写了 1G 的零进去.</p>
+<p>顺便一提, macOS 上并没有 fallocate, 你可以使用 <code>mkfile</code>.Linux 上也有类似的, 包含在 <code>xfsprogs</code> 中, 叫做 <code>xfs_mkfile</code>.</p>
+<pre><code>➜  ~ time mkfile -n 1G file_1G
+mkfile -n 1G file_1G  0.00s user 0.68s system 15% cpu 4.242 total
+</code></pre>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/818/" class="prev">上一篇</a><a href="/archives/809/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/812/';
+var disqus_title = 'fallocate 与 dd';
+var disqus_url = 'https://oao.moe/archives/812/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/304/"><title>搭建 Android 开发环境 · 云羽的羽毛</title>            <meta name="description" content="cur hp://commondaasorage.googeapis.com/gi-repo-downoads/repo amp;g; /bin/repo;因为构建 AOSP 的关系,所以需要一个厨房雾.;构建的 Android 版本是 6.0.1,而我们需要的 JDK 版本是 1.7">
+            <meta name="keywords" content="amp,pre,我们,repo,软件,6.0.1,386,git,USTC,lunch">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">搭建 Android 开发环境</h1><div class="post-info">Mar 1, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>因为构建 AOSP 的关系,所以需要一个厨房(雾.</p>
+<p>使用的系统为 Debian Sid</p>
+<p>构建的 Android 版本是 6.0.1,而我们需要的 JDK 版本是 1.7</p>
+<pre><code>apt-get purge openjdk-\* icedtea-\* icedtea6-\*
+apt-get update
+apt-get install openjdk-7-jdk
+`&lt;/pre&gt;
+
+安装完毕之后我们就需要修改我们的软件源,添加其对于 32 位元的支持.
+
+&lt;pre&gt;`dpkg --add-architecture i386
+`&lt;/pre&gt;
+
+接下来需要在源列表中添加架构设定.
+
+&lt;pre&gt;`deb [arch=amd64,i386] https://balbalabal.
+`&lt;/pre&gt;
+
+接下来则是更新列表
+
+&lt;pre&gt;`apt-get update
+`&lt;/pre&gt;
+
+更新列表之后就可以安装我们需要的软件了.
+
+&lt;pre&gt;`apt-get install bison g++-multilib git gperf libxml2-utils make zlib1g-dev:i386 zip
+`&lt;/pre&gt;
+
+然后我们需要一个软件,叫做 repo ,用来下载 AOSP 代码.
+
+&lt;pre&gt;`mkdir ~/bin
+curl http://commondatastorage.googleapis.com/git-repo-downloads/repo &amp;gt; ~/bin/repo
+chmod a+x ~/bin/repo
+export PATH=~/bin:$PATH
+`&lt;/pre&gt;
+
+如果你在中国大陆,请使用 USTC 的软件源
+
+&lt;pre&gt;`curl https://storage-googleapis.lug.ustc.edu.cn/git-repo-downloads/repo &amp;gt; ~/bin/repo
+`&lt;/pre&gt;
+
+并且将地址修改为 USTC 的地址.
+
+&lt;pre&gt;`nano ~/bin/repo
+#将 REPO_URL 替换为:
+git://mirrors.ustc.edu.cn/aosp/platform/manifest
+`&lt;/pre&gt;
+
+然后就是同步代码了.
+
+&lt;pre&gt;`mkdir ~/android
+cd ~/android
+repo init -u https://android.googlesource.com/platform/manifest -b android-6.0.1_r11
+repo sync
+`&lt;/pre&gt;
+
+同理,如果你生活在中国大陆,请使用 USTC 的源.
+
+&lt;pre&gt;`repo init -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b android-6.0.1_r11
+repo sync
+`&lt;/pre&gt;
+
+请预留大约 42G 的空间来同步.在同步完成,打好补丁后就可以开始构建了.
+
+&lt;pre&gt;`source build/envsetup.sh &amp;amp;&amp;amp; lunch
+`&lt;/pre&gt;
+
+在 lunch 的菜单中选择你的型号.
+
+&lt;pre&gt;`make -j
+</code></pre>
+<p>Happy cooking!</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/314/" class="prev">上一篇</a><a href="/archives/301/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/304/';
+var disqus_title = '搭建 Android 开发环境';
+var disqus_url = 'https://oao.moe/archives/304/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

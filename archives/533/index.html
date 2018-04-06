@@ -1,0 +1,24 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/533/"><title>跳过 SetupWizard · 云羽的羽毛</title>            <meta name="description" content="大家都知道 Android 有个设置向导,也就是 SeupWizard.apk 那个东西,需要联网什么的,简直烦人,并且墙国还要挂代理,真是烦死人了.;那么怎么办呢?首先你需要一个第三方的 recovery,例如 wrp,cwm 都可以.;重启进入 recovery,挂载 /sysem.然后进入命令行.">
+            <meta name="keywords" content="setupwizard,system,amp,什么的,recovery,然后,quot,apk,一个,build">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">跳过 SetupWizard</h1><div class="post-info">May 11, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>大家都知道 Android 有个设置向导,也就是 SetupWizard.apk 那个东西,需要联网什么的,简直烦人,并且墙国还要挂代理,真是烦死人了.</p>
+<p>那么怎么办呢?首先你需要一个第三方的 recovery,例如 twrp,cwm 都可以.</p>
+<p>重启进入 recovery,挂载 /system.然后进入命令行.</p>
+<pre><code>echo &quot;ro.setupwizard.mode=DISABLED&quot; &amp;gt;&amp;gt; /system/build.prop
+`&lt;/pre&gt;
+
+然后重启就行了.
+
+然后呢,还有一个情况就是,你不想完全跳过,你只是想跳过 WiFi 设置什么的.
+
+&lt;pre&gt;`sed -i 's/ro.setupwizard.wifi_required=true/ro.setupwizard.wifi_required=false/g' /system/build.prop
+</code></pre>
+<p>搞定.</p>
+<p>PS:请不要直接砍了 apk 本身…</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/536/" class="prev">上一篇</a><a href="/archives/531/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/533/';
+var disqus_title = '跳过 SetupWizard';
+var disqus_url = 'https://oao.moe/archives/533/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

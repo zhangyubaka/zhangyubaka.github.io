@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/907/"><title>全自动 Swap 管理 · 云羽的羽毛</title>            <meta name="description" content="gi cone hps://gihub.com/Nefeim4ag/sysemd-swap.gi;不得不说 macOS 可以自动增加/减少 Swap 的特性用起来很贴心, Linux 怎么享受呢?;Arch Linux 可以直接安装.">
+            <meta name="keywords" content="swap,swapfc,空间,systemd,一个,clone,https://github.com/Nefelim4ag/systemd-swap.git,Swap,15,Linux">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">全自动 Swap 管理</h1><div class="post-info">Apr 5, 2017</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="全自动-swap-管理"><a class="markdownIt-Anchor" href="#全自动-swap-管理"></a> 全自动 Swap 管理</h1>
+<p>不得不说 macOS 可以自动增加/减少 Swap 的特性用起来很贴心, Linux 怎么享受呢?</p>
+<p>交给 Systemd 吧(笑</p>
+<p>首先递 Repo: <code>https://github.com/Nefelim4ag/systemd-swap</code></p>
+<p>Arch Linux 可以直接安装.</p>
+<pre><code>sudo pacman -S systemd-swap
+</code></pre>
+<p>Debian 系可以构建 deb.</p>
+<pre><code>git clone https://github.com/Nefelim4ag/systemd-swap.git
+./systemd-swap/package.sh debian
+sudo dpkg -i ././systemd-swap/systemd-swap-*any.deb
+</code></pre>
+<p>别的就自己编译.</p>
+<pre><code>git clone https://github.com/Nefelim4ag/systemd-swap.git
+sudo make install
+</code></pre>
+<p>装完之后修改一下设置.</p>
+<pre><code>#vim /etc/systemd/swap.conf
+#这里只列出需要修改的
+
+swapfc_enabled=1    #启用 swap 管理. 如果是 btrfs 等不能 swapon 的, 去改 swapfu_*
+swapfc_frequency=2s     #检测 Swap 剩余空间的频率.    
+swapfc_chunk_size=1024M    #每个 swap 文件的大小, 空间小的话 256M 一个就可以了, 我改到 1G    
+swapfc_max_count=16    #最多多少个swap
+swapfc_free_swap_perc=15    #剩余多少 swap 空间时新加一个 swap, 这里是小于 15%, 如果空闲空间超过 55%(15+40) 就卸载一个.
+</code></pre>
+<p>启用服务即可.</p>
+<pre><code>sudo systemctl enable systemd-swap
+sudo systemctl start systemd-swap  
+</code></pre>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/908/" class="prev">上一篇</a><a href="/archives/902/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/907/';
+var disqus_title = '全自动 Swap 管理';
+var disqus_url = 'https://oao.moe/archives/907/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/59/"><title>在Archlinux上安装Awesome · 云羽的羽毛</title>            <meta name="description" content="Opion quo;HorizEdgeScroquo; quo;onquo;;闲的无聊在笔电上装了Arch结果我被拉到了大坑里啊!;pacman -S xorg-server xorg-apps xorg-xinirc xerm">
+            <meta name="keywords" content="quot,Option,pacman,xorg,xinitrc,TapButton,最后,转到,Nouveau,之后">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">在Archlinux上安装Awesome</h1><div class="post-info">Feb 28, 2015</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>闲的无聊在笔电上装了Arch…结果我被拉到了大坑里啊!</p>
+<p>安装过程按照Beginner’s Guide上来做, 倒是十分简单.pacstrap 安装 base,然后 fstab 生成之后把 grub 装上就行了.但是显卡驱动真是够难受的.</p>
+<a id="more"></a>
+<p>先把Xorg装好:</p>
+<pre><code>pacman -S xorg-server xorg-apps xorg-xinitrc xterm
+</code></pre>
+<p>接下来安装Nouveau:</p>
+<pre><code>pacman -S xf86-video-nouveau
+</code></pre>
+<p>原本我是打算 <code>yaourt -S nvidia-all</code> 搞定的,结果发现依赖有问题,nvidia-utils 的版本不对,果断转到 Nouveau 上去了.</p>
+<p>转到Nouveau之后要做的就是敲上两个配置文件,一个是Synaptics的配置.</p>
+<pre><code>#10-synaptics.conf:
+
+Section &quot;InputClass&quot;
+    Identifier &quot;touchpad&quot;
+    Driver &quot;synaptics&quot;
+    MatchIsTouchpad &quot;on&quot;
+        Option &quot;TapButton1&quot; &quot;1&quot;
+        Option &quot;TapButton2&quot; &quot;2&quot;
+        Option &quot;TapButton3&quot; &quot;3&quot;
+        Option &quot;VertEdgeScroll&quot; &quot;on&quot;
+        Option &quot;VertTwoFingerScroll&quot; &quot;on&quot;
+        Option &quot;HorizEdgeScroll&quot; &quot;on&quot;
+        Option &quot;HorizTwoFingerScroll&quot; &quot;on&quot;
+        Option &quot;CircularScrolling&quot; &quot;on&quot;
+        Option &quot;CircScrollTrigger&quot; &quot;2&quot;
+        Option &quot;EmulateTwoFingerMinZ&quot; &quot;40&quot;
+        Option &quot;EmulateTwoFingerMinW&quot; &quot;8&quot;
+              ...
+ EndSection
+</code></pre>
+<p>然后要启用 nv 模块:</p>
+<pre><code>#20-nouveau.conf:
+
+Section &quot;Device&quot;
+    Identifier &quot;nouveau&quot;
+    Driver &quot;nouveau&quot;
+EndSection
+</code></pre>
+<p>这样就不会出现什么错误了.<br>
+最后使用SLiM配置桌面管理:<code>pacman -S slim</code><br>
+编辑 <code>~/.xinitrc</code>,在最后一行加入<code>exec awesome</code> 并注释掉其他的 exec.<br>
+(没有.xinitrc的话cp /etc/skel/.xinirc ~/)<br>
+最后<code>pacman -S awesome</code> 搞定!</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/65/" class="prev">上一篇</a><a href="/archives/56/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/59/';
+var disqus_title = '在Archlinux上安装Awesome';
+var disqus_url = 'https://oao.moe/archives/59/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

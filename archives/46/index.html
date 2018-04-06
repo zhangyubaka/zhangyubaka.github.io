@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/46/"><title>如何优雅地配置shadowsocks · 云羽的羽毛</title>            <meta name="description" content="vim /ec/shadowsocks.json //配置shadowsocks;PS:请注意一下本篇文章时间,目前指 2016 看到的你们已经过期.;嗯,现在开始正题,配置 shadowsocks.首先奉上gi:hps://gihub.com/cowwindy/shadowsocks">
+            <meta name="keywords" content="quot,shadowsocks,服务器,端口,pip,域名,Server,IP,密码,一下">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">如何优雅地配置shadowsocks</h1><div class="post-info">Dec 27, 2014</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p><strong>PS:请注意一下本篇文章时间,目前(指 2016 看到的你们)已经过期.</strong></p>
+<p>推荐一下 Proxifier.</p>
+<p>嗯,现在开始正题,配置 shadowsocks.首先奉上git:<code>https://github.com/clowwindy/shadowsocks</code></p>
+<p>然后 Client 端这里使用 node.js 的.</p>
+<a id="more"></a>
+<p><img src="https://zhangyubaka.qiniudn.com/%E6%8D%95%E8%8E%B7.PNG" alt=""></p>
+<p>这里就是图.Server IP填入你的ss服务器ip/域名.Server Port填入服务器端口,Password就是服务器密码,Local Port是本地的Socks5代理端口,默认1080.Encryption中是加密方法,取决于服务端.</p>
+<p>下面是服务端设置.</p>
+<pre><code>apt-get install python-pip //安装pip
+pip install shadowsocks //安装shadowsocks
+vim /etc/shadowsocks.json //配置shadowsocks
+</code></pre>
+<p>在json中输入:</p>
+<pre><code>{
+    &quot;server&quot;:&quot;服务器IP/域名&quot;,
+    &quot;server_port&quot;:服务端端口,
+    &quot;local_address&quot;: &quot;127.0.0.1&quot;,
+    &quot;local_port&quot;:1080,
+    &quot;password&quot;:&quot;密码&quot;,
+    &quot;timeout&quot;:300,
+    &quot;method&quot;:&quot;aes-256-cfb&quot;,
+    &quot;fast_open&quot;: false
+}
+</code></pre>
+<p>自行替代.然后输入nohup ssserver -c /etc/shadowsocks.json -d start 启动.</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/48/" class="prev">上一篇</a><a href="/archives/39/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/46/';
+var disqus_title = '如何优雅地配置shadowsocks';
+var disqus_url = 'https://oao.moe/archives/46/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

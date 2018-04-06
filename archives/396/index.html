@@ -1,0 +1,42 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/396/"><title>为 Z5 Compact 编译 Cyanogen Mod · 云羽的羽毛</title>            <meta name="description" content="接下来的命令请在 cm13/ 文件夹内执行;PS:更新1:修改 Gi 地址至 LineageOS;系统是 Ubunu 15.10">
+            <meta name="keywords" content="dev,amp,repo,git,suzuran,然后,multilib,lib,32,11">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">为 Z5 Compact 编译 Cyanogen Mod</h1><div class="post-info">Apr 15, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>PS:更新1:修改 Git 地址至 LineageOS</p>
+<p>首先敬上编译 <a href="https://oao.moe/archives/304">AOSP</a> 的教程,因为二者大同小异.</p>
+<p>系统是 Ubuntu 15.10</p>
+<p>首先肯定是安装需要安装的软件包咯:</p>
+<pre><code>apt-get install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip maven schedtool openjdk-7-jdk
+</code></pre>
+<p>注:你如果安装有其他版本的 JDK 请卸载掉, CM 目前只支持 7.</p>
+<p>然后下载 repo 这个不用说了吧,AOSP 那一篇文章里面都有的.</p>
+<p>接下来就是去下载源码包了.</p>
+<pre><code>mkdir cm13
+cd cm13
+repo init -u https://github.com/LineageOS/android.git -b cm-13.0
+repo sync
+</code></pre>
+<p>整个源码包大概 20G 上下,安静等待就好了.</p>
+<p>接下来的命令请在 cm13/ 文件夹内执行</p>
+<p>然后我们需要添加 Z5 Compact 的 manifest.</p>
+<pre><code>git clone https://github.com/Sony-Kitakami/android_.repo_local_manifests.git -b cm-13.0-suzuran    //Z5 为 sumire, Z5 Premium 为 satsuki
+repo sync --force-sync
+</code></pre>
+<p>这个也需要一些时间,请坐和放宽.</p>
+<p>在同步完成后我们就可以构建了.</p>
+<pre><code>source build/envsetup.sh
+lunch    //这里选择 cm_suzuran_userdebug
+mka clobber
+mka bacon
+</code></pre>
+<p>请静静等待构建的完成.输出的结果位于:/cm13/out/target/product/suzuran/</p>
+<p>更新 manifest 可以通过</p>
+<pre><code>cd .repo/local_manifests/ &amp;&amp; git pull &amp;&amp; cd ../.. &amp;&amp; repo sync --force-sync
+</code></pre>
+<p>来解决.</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/400/" class="prev">上一篇</a><a href="/archives/391/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/396/';
+var disqus_title = '为 Z5 Compact 编译 Cyanogen Mod';
+var disqus_url = 'https://oao.moe/archives/396/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

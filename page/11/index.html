@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/page/11/"><title>云羽的羽毛</title><!--| !{ auto_keyword_desc(page.content) }--><meta name="description" content="羽毛的博客"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><ul class="home post-list"><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/656/" class="post-title-link">夏天到了</a></h2><div class="post-info">Jul 29, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>或许你可能取得了一点成果,或许你新造了一个很强的轮子.但是这仍然不能改变是个弱鸡的事实,与其去吹逼然后被揭穿的难堪,何不闭嘴之?</p>
+<p>或许常常去关心别人,但是这并不是等价交换,你不应去期待别人也来关心你.更何况你大概也不值得被关心吧.不要期待太多.</p>
+<p>虽说是他人的事情,但是总感觉有自己的影子.</p>
+<p>你所期待的常常与结果背道而驰,但是这并不意味着失败.也许相反的结果正是你需要的呢.</p></div><a href="/archives/656/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/652/" class="post-title-link">维护你自己的 Gentoo Overlay</a></h2><div class="post-info">Jul 28, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>有些时候呢,你需要加一些 Ebuild 或者 Profile,结果发现好麻烦啊好麻烦啊,为什么不自己开个 Overlay 呢?</p>
+<p>那么,就开始吧!首先创建我们的 Overlay 文件夹,个人习惯放在 <code>/usr/local/portage</code></p>
+<pre><code>mkdir -p /usr/local/portage/{metadata,profiles}
+</code></pre>
+<p>其中,metadata 是存放 Overlay 属性用,Profiles 则是存放 Portage profile 相关文件的地方.</p></div><a href="/archives/652/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/648/" class="post-title-link">在 Raspberry Pi 2 上安装 Gentoo - stage 1</a></h2><div class="post-info">Jul 23, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>仔细看了下 rpi 的启动步骤,理论上是可行的,经过实践之后发现确实可行.</p>
+<p>首先我们需要一个 stage3 和 livecd,和在你的 PC 上安装是一样的.不过呢,rpi 上没有 livecd 这种东西,我们就用 Raspbian 来代替.</p>
+<p>首先准备好一个 sd 卡,如果 sd 卡空间是 64G 的话你就不需要优盘,不过我还是建议准备一个优盘.</p>
+<p>首先我们下载 Raspbian 的镜像,写到 sd 卡上面.</p></div><a href="/archives/648/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/645/" class="post-title-link">在 Mac 上接受 X11 Forwarding</a></h2><div class="post-info">Jul 20, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>在 rpi 上玩了玩,发现没有 X,还是好无聊啊啊啊啊!</p>
+<p>首先在 SSHD 里面打开 X11 相关设置.</p>
+<pre><code>#vim /etc/ssh/sshd_config
+X11Forwarding yes
+X11DisplayOffset 10
+X11UseLocalhost yes
+</code></pre>
+<p>然后安装 XQuartz.</p></div><a href="/archives/645/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/641/" class="post-title-link">北京面基有感</a></h2><div class="post-info">Jul 18, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>看了 Cee 的消息,嗯好像北京人很多的样子,于是就去北京了.</p>
+<p>然后呢,我吃到的第一个教训就是不要用 Telegram 的地图,亦或其他使用 Google Maps SDK (不包括 Google Maps 本身)的应用来分享位置,尤其是你/他人开了 Xposed 的纠偏模组的时候.偏移度简直感人,约为 1.6 km 的半径.</p>
+<p>然后就是,哎呀北京宜家要完蛋啦,直接写的宜家餐饮啦,完蛋啦!不过那个家具安装指南好简洁啊,太简洁了啊!</p>
+<p>整个人也是疯狂喝酒,根本不虚.</p></div><a href="/archives/641/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/631/" class="post-title-link">macOS 上的 Kali 工具</a></h2><div class="post-info">Jul 7, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>目前没心情开个新 VM 跑 Kali,遂打算把 Kali 的工具装到 macOS 上面.</p>
+<h2 id="metasploit"><a class="markdownIt-Anchor" href="#metasploit"></a> Metasploit</h2>
+<p>这个蛮简单的,官方有提供 pkg,我们只需要下载下来安装就好.</p>
+<pre><code>wget http://downloads.metasploit.com/data/releases/metasploit-framework/osx/metasploitframework-latest.pkg
+</code></pre></div><a href="/archives/631/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/627/" class="post-title-link">Optimize your Gentoo</a></h2><div class="post-info">Jul 7, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>First,if you have more than one Gentoo machine,try DistCC.</p>
+<p>But since I only got one,we gonna ignore DistCC for now.</p>
+<p>ccache is a great tool which will speed up compilation process,first emerge it.</p>
+<pre><code>emerge --ask ccache  
+</code></pre></div><a href="/archives/627/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/625/" class="post-title-link">我就是要用低端口!</a></h2><div class="post-info">Jul 2, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>大家都知道低于 1024 的端口只能让高权限用户使用,但是一些时候呢,一些程序就需要开个低端口但是我不想提权.</p>
+<p>很好,Linux 内核解决了这个问题.</p>
+<pre><code>setcap 'cap_net_bind_service=+ep' /path/to/program
+#path to program 替换为程序绝对路径
+</code></pre>
+<p>这样这个程序就可以绑定到 1024 以内的端口了,Hooray!</p></div><a href="/archives/625/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/623/" class="post-title-link">修复 tmux 环境下的鼠标滚轮</a></h2><div class="post-info">Jun 28, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>突然发现滚轮会被认为是上,然后就在滚历史命令而不是这个页面了,真是尴尬.</p>
+<p>在 tmux.conf 加两行即可.</p>
+<pre><code>bind -n WheelUpPane if-shell -F -t = &quot;#{mouse_any_flag}&quot; &quot;send-keys -M&quot; &quot;if -Ft= '#{pane_in_mode}' 'send-keys -M' 'select-pane -t=; copy-mode -e; send-keys -M'&quot;
+bind -n WheelDownPane select-pane -t= \; send-keys -M
+</code></pre>
+<p>当然你需要打开滑鼠模式.</p></div><a href="/archives/623/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/619/" class="post-title-link">缩小 dd 备份的空间</a></h2><div class="post-info">Jun 28, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>之前呢,用 dd 备份了一下 tf 卡,然后发现这东西怎么这么大,足足 30G,大小爆炸了.</p>
+<p>然后就思考出了办法.</p>
+<p>首先填充空字节,覆写掉已删除的文件.</p>
+<pre><code>#到 sdcard 中
+cd /mnt/sdcard
+#写入'0'
+dd if=/dev/zero of=asdf.txt
+</code></pre></div><a href="/archives/619/" class="read-more">...阅读全文</a></article></li></ul></main><footer><div class="paginator"><a href="/page/10/" class="prev">上一页</a><a href="/page/12/" class="next">下一页</a></div><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

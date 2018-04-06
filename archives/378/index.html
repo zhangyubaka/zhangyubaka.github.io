@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/378/"><title>编译 Android 内核与修改 ramdisk · 云羽的羽毛</title>            <meta name="description" content=";preg;dboo -o d.img -s 2048 -p scrips/dc/ arch/arm/boo/ds/    //生成 d.img;首先说明一下,系统环境是 Ubunu 15.10.;编译内核,你需要 cross compier, mkbooimg, cpio, 和能用的 ramdisk/roofs.">
+            <meta name="keywords" content="ramdisk,amp,boot,cpio,msm,我们,img,quot,pre,这里">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">编译 Android 内核与修改 ramdisk</h1><div class="post-info">Apr 7, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>首先说明一下,系统环境是 Ubuntu 15.10.</p>
+<p><del>至于为什么是 Ubuntu,嘛,是因为 Vultr 的镜像没有 Gentoo.</del></p>
+<p>编译内核,你需要 cross compiler, mkbootimg, cpio, 和能用的 ramdisk/rootfs.</p>
+<p>首先安装你需要的软件:</p>
+<pre><code>sudo apt-get install -y build-essential kernel-package libncurses5-dev bzip2 cpio git
+git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9  //工具链
+git clone https://github.com/osm0sis/mkbootimg.git    //mkbootimg
+cd mkbootimg &amp;amp;&amp;amp; make
+`&lt;/pre&gt;
+
+然后 clone 一份你需要的内核源码, cd 进去.
+
+&lt;pre&gt;`cd kernel
+export ARCH=arm64
+export PATH=/home/feather/aarch64-linux-android-4.9/bin/:$PATH    //这里修改为你的 cross compiler 位置
+export CROSS_COMPILE=aarch64-linux-android-
+make mrproper
+`&lt;/pre&gt;
+
+接下来的部分就是取决于你的内核,手机了,例如我的是 Xperia Z5 Compact,代号是 suzuran,套用的设置是 suzuran_diffconfig.
+
+&lt;pre&gt;`export KBUILD_DIFFCONFIG=suzuran_diffconfig
+make msm8994-perf_defconfig
+make menuconfig    //这里检查一下配置
+make -j
+`&lt;/pre&gt;
+
+接下来就是组装/封装 Kernel 了,也就是我们要刷入的 boot.img.这里要注意,**每个设备的 cmdline,base,pagesize,ramdisk_offset,tags_offset 可能不同,请再三确认.**
+
+&lt;pre&gt;`mkbootimg \
+  --kernel arch/arm64/boot/Image.gz-dtb \
+  --ramdisk ramdisk.img \
+  --cmdline &quot;androidboot.hardware=qcom user_debug=31 msm_rtb.filter=0x237 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 boot_cpus=0-5 dwc3_msm.prop_chg_detect=Y coherent_pool=2M dwc3_msm.hvdcp_max_current=1500&quot; \
+  --base 0x00000000 \
+  --pagesize 4096 \
+  --ramdisk_offset 0x02000000 \
+  --tags_offset 0x01E00000 \
+  --output boot.img
+`&lt;/pre&gt;
+
+PS:然后我发现啊,Image.gz-dtb 这不明写着已经有了 dtb 了么...所以不需要单独封装 dtb 了.可以直接跳至 ramdisk 部分.
+
+&lt;del datetime=&quot;2016-07-28T08:08:36+00:00&quot;&gt;注:少数高通的设备需要附加 dtb,需要不同的封装方法:
+
+首先我们需要 dtbtool.
+
+&lt;pre&gt;`git clone https://github.com/ryan-andri/dtbtool
+cd dtbtool
+make
+`&lt;/pre&gt;
+
+拿到 dtbtool 之后我们就可以封装了.
+
+&lt;pre&gt;`dtbtool -o dt.img -s 2048 -p scripts/dtc/ arch/arm/boot/dts/    //生成 dt.img
+mkbootimg \
+  --kernel arch/arm64/boot/Image \
+  --ramdisk ../build_suzuran/ramdisk.img \
+  --cmdline &quot;androidboot.hardware=qcom user_debug=31 msm_rtb.filter=0x237 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 boot_cpus=0-5 dwc3_msm.prop_chg_detect=Y coherent_pool=2M dwc3_msm.hvdcp_max_current=1500&quot; \
+  --base 0x00000000 \
+  --pagesize 4096 \
+  --ramdisk_offset 0x02000000 \
+  --tags_offset 0x01E00000 \
+  --dt dt.img \
+  --output boot.img
+`&lt;/pre&gt;
+
+&lt;/del&gt;
+
+说起来我似乎没有讲 ramdisk 是什么,是做什么的...
+
+ramdisk,其实就是 initramfs,或者 initrd.里面包含了 init 和一堆其他的,用于引导设备的文件,在你的设备第一屏的时候其实就是 ramdisk 在引导.
+
+那么怎么拿到 ramdisk 呢?
+
+第一种方法是从一个已有的内核里面解出来一个,这个最简单,也最方便,因为不是所有人都存着那 40 G 多的源码的.
+
+第二种就是自己构建了,在构建 AOSP/CM 这种第三方的 ROM 时候比较常见,因为你已经有了他们的源码.
+
+这里说一下第一种吧,第二种等会...
+
+前辈们已经做好了一个 Perl 脚本给我们,所以直接拿来主义:
+
+&lt;pre&gt;`wget https://gist.github.com/jberkel/1087743/raw/45046f87176dfacdc22af4290f89a0d2e0df1dbb/split_bootimg.pl
+chmod +x split_bootimg.pl
+./split_bootimg.pl boot.img
+`&lt;/pre&gt;
+
+然后我们就拿到了 kernel,和 ramdisk,这也就是 Linux 上比较常见的了,内核与 initrd 分离的形态.
+
+其实这个时候就可以用了,把 boot.img-ramdisk.gz 封装进去就好,不过如果你想修改 Ramdisk 可以继续看下去.
+
+接下来是解压 ramdisk.因为 ramdisk 是 cpio 压缩,所以我们先解压 gzip,再用 cpio.
+
+&lt;pre&gt;`mkdir ramdisk &amp;amp;&amp;amp; cd ramdisk
+gzip -dc ../boot.img-ramdisk.gz | cpio -i
+`&lt;/pre&gt;
+
+这里我们就可以修改了,修改好了之后在打包回去:
+
+&lt;pre&gt;`find . | cpio -o -H newc | gzip &amp;gt; ../newramdisk.cpio.gz
+</code></pre>
+<p>然后又是一个崭新的 ramdisk 了 (笑</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/386/" class="prev">上一篇</a><a href="/archives/376/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/378/';
+var disqus_title = '编译 Android 内核与修改 ramdisk';
+var disqus_url = 'https://oao.moe/archives/378/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

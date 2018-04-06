@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/652/"><title>维护你自己的 Gentoo Overlay · 云羽的羽毛</title>            <meta name="description" content="这里的名字和 masers 要与你上面设定的保持一致.;有些时候呢,你需要加一些 Ebuid 或者 Profie,结果发现好麻烦啊好麻烦啊,为什么不自己开个 Overay 呢?;mkdir -p /usr/oca/porage/meadaa,profies">
+            <meta name="keywords" content="portage,local,usr,Overlay,Ebuild,raspi,config,masters,我们,Portage">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">维护你自己的 Gentoo Overlay</h1><div class="post-info">Jul 28, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>有些时候呢,你需要加一些 Ebuild 或者 Profile,结果发现好麻烦啊好麻烦啊,为什么不自己开个 Overlay 呢?</p>
+<p>那么,就开始吧!首先创建我们的 Overlay 文件夹,个人习惯放在 <code>/usr/local/portage</code></p>
+<pre><code>mkdir -p /usr/local/portage/{metadata,profiles}
+</code></pre>
+<p>其中,metadata 是存放 Overlay 属性用,Profiles 则是存放 Portage profile 相关文件的地方.</p>
+<p>然后进行基础的设定.</p>
+<pre><code>echo 'Overlay 名字' &amp;gt; /usr/local/portage/profiles/repo_name
+echo 'masters = gentoo' &amp;gt; /usr/local/portage/metadata/layout.conf
+chown -R portage:portage /usr/local/portage
+</code></pre>
+<p>Overlay 的名字建议起一个好记得即可,<code>masters = gentoo</code> 的作用则是告诉 Portage 他是基于 gentoo 官方源 Overlay.如果你不是的话,你也可以设定为 <code>masters = sabayon</code> 之类的.</p>
+<p>接下来把它添加到 Portage 设定里面.</p>
+<pre><code>#vim /etc/portage/repos.conf/local.conf
+[Overlay 名字]
+location = /usr/local/portage
+masters = gentoo
+auto-sync = no
+</code></pre>
+<p>这里的名字和 masters 要与你上面设定的保持一致.</p>
+<p>至于加 Ebuild 就很简单了,按照 Portage 树的格式添加.这里我们添加 <code>raspi-config-0_pre20160506.ebuild</code></p>
+<pre><code>mkdir -p /usr/local/portage/app-misc/raspi-config
+cp ~/raspi-config-0_pre20160506.ebuild /usr/local/portage/app-misc/raspi-config/
+chown -R portage:portage /usr/local/portage
+pushd /usr/local/portage/app-misc/raspi-config/
+repoman manifest
+popd
+</code></pre>
+<p>首先我们按照 Ebuild 的分类,创建文件夹,然后将 Ebuild 复制进去,最后生成包括 SHA256 SHA512 WHIRLPOOL 校验的 Manifest.</p>
+<p>如果你一次添加了很多的 Ebuild 的话,可以直接在 /usr/local/portage 处执行 <code>repoman manifest</code>,可以批量生成 Manifest.</p>
+<p>然后就可以测试我们的 Ebuild 了.</p>
+<pre><code>emerge -a raspi-config
+</code></pre>
+<p>这样是不是比直接调用 <code>ebuild.sh</code> 好多了!</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/656/" class="prev">上一篇</a><a href="/archives/648/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/652/';
+var disqus_title = '维护你自己的 Gentoo Overlay';
+var disqus_url = 'https://oao.moe/archives/652/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

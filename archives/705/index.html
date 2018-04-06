@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/705/"><title>关掉 AES 加速 · 云羽的羽毛</title>            <meta name="description" content="The numbers are in 1000s of byes per second processed.;有些时候不测试一下怎么知道硬件加速的重要性呢?;方法2:BIOS 关掉 AES.">
+            <meta name="keywords" content="256,ASM,aes,cfb,bytes,DOPENSSL,64,Doing,for,blocks">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">关掉 AES 加速</h1><div class="post-info">Aug 12, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>有些时候不测试一下怎么知道硬件加速的重要性呢?</p>
+<p>首先自然是试着 rmmod,失败.</p>
+<pre><code>rmmod aesni_intel
+rmmod -f aesni_intel
+modprobe -rf aesni_intel
+</code></pre>
+<p>全都不行,那怎么办呢?</p>
+<p>方法2:BIOS 关掉 AES.</p>
+<p>可是虚拟机他关不掉!</p>
+<p>那就只能从 OpenSSL 下手了,根据 OpenSSL 的邮件列表,加上一个环境变量就可以禁用 AES 加速.</p>
+<pre><code>OPENSSL_ia32cap=&quot;~0x200000200000000&quot;
+</code></pre>
+<p>可以对比一下结果:</p>
+<pre><code>openssl speed -elapsed -evp aes-256-cfb
+
+You have chosen to measure elapsed time instead of user CPU time.
+Doing aes-256-cfb for 3s on 16 size blocks: 51161962 aes-256-cfb's in 3.00s
+Doing aes-256-cfb for 3s on 64 size blocks: 14698120 aes-256-cfb's in 3.00s
+Doing aes-256-cfb for 3s on 256 size blocks: 3176635 aes-256-cfb's in 3.00s
+Doing aes-256-cfb for 3s on 1024 size blocks: 804198 aes-256-cfb's in 3.05s
+Doing aes-256-cfb for 3s on 8192 size blocks: 103408 aes-256-cfb's in 2.99s
+OpenSSL 1.0.2h  3 May 2016
+built on: reproducible build, date unspecified
+options:bn(64,64) rc4(ptr,int) des(idx,cisc,16,int) aes(partial)                 idea(int) blowfish(idx)
+compiler: cc -I. -I.. -I../include  -fPIC -fno-common -    DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -arch x86_64 -O3 -DL_ENDIAN -Wall -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_MONT5 -DOPENSSL_BN_ASM_GF2m -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DAES_ASM -DVPAES_ASM -DBSAES_ASM -DWHIRLPOOL_ASM -DGHASH_ASM -DECP_NISTZ256_ASM
+The 'numbers' are in 1000s of bytes per second processed.
+type             16 bytes     64 bytes    256 bytes   1024 bytes       8192 bytes
+aes-256-cfb     272863.80k   313559.89k   271072.85k   269999.59k   283317.17k
+</code></pre>
+<p>然后我们关掉 AES.</p>
+<pre><code>OPENSSL_ia32cap=&quot;~0x200000200000000&quot; openssl speed -elapsed -evp aes-256-cfb
+
+You have chosen to measure elapsed time instead of user CPU time.
+Doing aes-256-cfb for 3s on 16 size blocks: 16624135 aes-256-cfb's in 3.00s
+Doing aes-256-cfb for 3s on 64 size blocks: 3965950 aes-256-cfb's in 3.01s
+Doing aes-256-cfb for 3s on 256 size blocks: 1023430 aes-256-cfb's in 3.00s
+Doing aes-256-cfb for 3s on 1024 size blocks: 368518 aes-256-cfb's in 3.01s
+Doing aes-256-cfb for 3s on 8192 size blocks: 38508 aes-256-cfb's in 3.01s
+OpenSSL 1.0.2h  3 May 2016
+built on: reproducible build, date unspecified
+options:bn(64,64) rc4(ptr,int) des(idx,cisc,16,int) aes(partial) idea(int) blowfish(idx)
+compiler: cc -I. -I.. -I../include  -fPIC -fno-common -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -arch x86_64 -O3 -DL_ENDIAN -Wall -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_MONT5 -DOPENSSL_BN_ASM_GF2m -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DAES_ASM -DVPAES_ASM -DBSAES_ASM -DWHIRLPOOL_ASM -DGHASH_ASM -DECP_NISTZ256_ASM
+The 'numbers' are in 1000s of bytes per second processed.
+type             16 bytes     64 bytes    256 bytes   1024 bytes   8192 bytes
+aes-256-cfb      88662.05k    84325.85k    87332.69k   125369.58k   104803.17k
+</code></pre>
+<p>差距巨大…</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/713/" class="prev">上一篇</a><a href="/archives/703/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/705/';
+var disqus_title = '关掉 AES 加速';
+var disqus_url = 'https://oao.moe/archives/705/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

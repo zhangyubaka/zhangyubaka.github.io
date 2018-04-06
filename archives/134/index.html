@@ -1,0 +1,124 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/134/"><title>在raspberry pi2上装Gentoo for ARM · 云羽的羽毛</title>            <meta name="description" content="nano -w /mn/genoo/boo/cmdine.x;这显然是个挑战,不过RPI2的CPU编译速度还是可以的,配合ccache还是可以用的.;首先和在电脑上安装一样,在hp://genoo.osuos.org/reeases/arm/auobuids/curren-sage3-armv7a_hardfp/这里下载sage3,然后把你的sdcard插到电脑上.">
+            <meta name="keywords" content="mnt,gentoo,etc,mmcblk,boot,dev,然后,usr,quot,init">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">在raspberry pi2上装Gentoo for ARM</h1><div class="post-info">Oct 7, 2015</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>这显然是个挑战,不过RPI2的CPU编译速度还是可以的,配合ccache还是可以用的.<br>
+需要环境:Linux电脑+Raspberry pi2一块+网线+带有dhcp服务器的东西+RPI2的电源线 可选:TTL线.</p>
+<a id="more"></a>
+<p>首先和在电脑上安装一样,在<a href="http://gentoo.osuosl.org/releases/arm/autobuilds/current-stage3-armv7a_hardfp/" rel="external nofollow noopener noreferrer" target="_blank">http://gentoo.osuosl.org/releases/arm/autobuilds/current-stage3-armv7a_hardfp/</a>这里下载stage3,然后把你的sdcard插到电脑上.<br>
+首先是分区:</p>
+<pre><code>cfdisk /dev/mmcblk0
+</code></pre>
+<p>我们分3个区,513M的/boot(mmcblk0p1) 4G的SWAP(mmcblk0p2) 还有剩余空间都分到/ (mmcblk0p3)<br>
+格式化:</p>
+<pre><code>mkfs.ext4 /dev/mmcblk0p3
+mkfs.vfat /dev/mmcblk0p1
+mkswap /dev/mmcblk0p2
+</code></pre>
+<p>接下来挂载分区.</p>
+<pre><code>mkdir /mnt/gentoo
+mount /dev/mmcblk0p3 /mnt/gentoo
+mkdir /mnt/gentoo/boot
+mount /dev/mmcblk0p1 /mnt/gentoo/boot
+</code></pre>
+<p>然后把stage3解压进去.</p>
+<pre><code>cp ~/stage3-*.tar.bz2 /mnt/gentoo
+cd /mnt/gentoo
+tar xvjpf stage3-*.tar.bz2 --xattrs
+</code></pre>
+<p>接下来就是下载portage,<a href="http://gentoo.osuosl.org/snapshots/portage-latest.tar.xz" rel="external nofollow noopener noreferrer" target="_blank">http://gentoo.osuosl.org/snapshots/portage-latest.tar.xz</a><br>
+然后把它解压到/usr/portage里</p>
+<pre><code>cp portage-latest.tar.xz /mnt/gentoo/usr/
+tar xpf portage-latest.tar.xz
+</code></pre>
+<p>然后就是配置kernel和firmware</p>
+<pre><code>cd ~
+git clone --depth 1 git://github.com/raspberrypi/firmware/
+cd firmware/boot
+cp * /mnt/gentoo/boot/
+cp -r ../modules /mnt/gentoo/lib/
+</code></pre>
+<p>然后是fstab</p>
+<pre><code>nano -w /mnt/gentoo/etc/fstab
+</code></pre>
+<p>这是我的fstab.</p>
+<pre><code>/dev/mmcblk0p1      /boot       vfat        noauto,noatime  1 2
+/dev/mmcblk0p3      /           ext4        noatime         0 1
+/dev/mmcblk0p2      none        swap        sw              0 0
+</code></pre>
+<p>然后是调整cmdline,因为rpi2没有grub这种东西…</p>
+<pre><code>nano -w /mnt/gentoo/boot/cmdline.txt
+</code></pre>
+<p>我的cmdline:</p>
+<pre><code>dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p3 rootfstype=ext4 elevator=deadline rootwait
+</code></pre>
+<p>配置时区:</p>
+<pre><code>ls /mnt/gentoo/usr/share/zoneinfo //查看时区
+cp /mnt/gentoo/usr/share/zoneinfo/America/Chicago /mnt/gentoo/etc/localtime  //中国的话是Asia/Shanghai
+echo &quot;America/Chicago&quot; &amp;gt; /mnt/gentoo/etc/timezone  //同理
+</code></pre>
+<p>然后我们把root密码重置为空:</p>
+<pre><code>nano -w /mnt/gentoo/etc/shadow
+</code></pre>
+<p>root那里修改为:</p>
+<pre><code>root::10770:0:::::
+</code></pre>
+<p>添加开机启动:</p>
+<pre><code>ln -s /mnt/gentoo/etc/init.d/sshd /mnt/gentoo/etc/runlevel/default/sshd
+cp /mnt/gentoo/etc/init.d/net.lo /mnt/gentoo/etc/init.d/net.eth0
+ln -s /mnt/gentoo/etc/init.d/net.eth0 /mnt/gentoo/etc/runlevel/boot/net.eth0
+</code></pre>
+<p>卸载分区,把你的sdcard插入rpi2:</p>
+<pre><code>umount /mnt/gentoo/boot
+umount /mnt/gentoo
+</code></pre>
+<p>等你的rpi2开机后,首先调整make.conf</p>
+<pre><code>nano -w /etc/portage/make.conf
+</code></pre>
+<p>添加MAKEOPTS:</p>
+<pre><code>MAKEOPTS=&quot;-j5&quot;
+</code></pre>
+<p>然后同步你的系统</p>
+<pre><code>echo 'nameserver 8.8.4.4' &amp;gt;&amp;gt; /etc/resolv.conf
+emerge-websync
+emerge --sync
+rc-update --update
+nano /etc/rc.conf    //去掉rc_sys=&quot;&quot;前的注释
+</code></pre>
+<p>设置profile:</p>
+<pre><code>eselect profile list
+eselect profile set 28
+</code></pre>
+<p>设置Locale:</p>
+<pre><code>nano -w /etc/locale.gen //加入你想要的locale
+locale-gen
+eselect locale list
+eselect locale set   //选择你要的
+</code></pre>
+<p>启用软件时钟:</p>
+<pre><code>rc-update add swclock boot
+rc-update del hwclock boot
+</code></pre>
+<p>然后就是安装必要软件:</p>
+<pre><code>emerge -a ntp ccache
+</code></pre>
+<p>同步时间:</p>
+<pre><code>ntpdate pool.ntp.org
+</code></pre>
+<p>启用ccache:</p>
+<pre><code>nano -w /etc/portage/make.conf
+</code></pre>
+<p>加入:</p>
+<pre><code>FEATURES=&quot;ccache&quot;
+CCACHE_SIZE=&quot;2G&quot;
+</code></pre>
+<p>更新系统:</p>
+<pre><code>emerge -avND @world
+</code></pre>
+<p><strong>OK!Enjoy!</strong></p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/140/" class="prev">上一篇</a><a href="/archives/132/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/134/';
+var disqus_title = '在raspberry pi2上装Gentoo for ARM';
+var disqus_url = 'https://oao.moe/archives/134/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

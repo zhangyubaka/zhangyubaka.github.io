@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/39/"><title>搭建一个舰娘私服-Kcsrv · 云羽的羽毛</title>            <meta name="description" content="注:我推荐可以睡一觉或者看上几个视频;首先贴上Gihub地址:Kcsrv;你需要Pyhon3 pip posgresq←这个会在后边安装">
+            <meta name="keywords" content="flask,config,Debian,git,错误,环境,Bcrypt,一种,首先,5000">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">搭建一个舰娘私服-Kcsrv</h1><div class="post-info">Dec 16, 2014</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>首先贴上Github地址:<a href="https://github.com/KanColleTool/kcsrv" rel="external nofollow noopener noreferrer" target="_blank">Kcsrv</a></p>
+<p>环境:Linux,推荐Archlinux,Debian或Ubuntu或其他Debian系(CentOS未测试)</p>
+<p>你需要Python3 pip postgresql←这个会在后边安装</p>
+<a id="more"></a>
+<p>首先把代码下载到本地,没有git请自行安装.<br>
+git clone <a href="https://github.com/KanColleTool/kcsrv.git" rel="external nofollow noopener noreferrer" target="_blank">https://github.com/KanColleTool/kcsrv.git</a></p>
+<p>下载完成并且没有错误之后,进入虚拟环境</p>
+<pre><code>cd kcsrv
+virtualenv -p /usr/bin/python3 .
+source ./bin/activate
+</code></pre>
+<p>如果报错:</p>
+<pre><code>pip install virtualenv
+</code></pre>
+<p>之后安装依赖:</p>
+<pre><code>pip install -r requirements.txt
+</code></pre>
+<p>接下来来安装PostgreSQL:</p>
+<pre><code>pacman -S postgresql
+apt-get install postgresql
+</code></pre>
+<p>然后来创建用户和DB:</p>
+<pre><code>sudo -u postgres createuser --superuser $USER
+createdb kcsrv  
+</code></pre>
+<p>导入数据库和配置:</p>
+<pre><code>./manage.py db upgrade
+./manage.py update_db
+./manage.py setup
+</code></pre>
+<p>下载缓存:</p>
+<pre><code>./manage.py dlassets
+</code></pre>
+<p>注:我推荐可以睡一觉或者看上几个视频</p>
+<p>接下来修改配置文件:</p>
+<pre><code>cp ./config.example.py ./config.py
+vim config.py
+</code></pre>
+<p>把SECRET_KEY和和SALT填上12位随机数字就好了</p>
+<p><strong>注:如果有抛出Bcrypt的错误的话请安装Bcrypt!</strong></p>
+<pre><code>pip install bcrypt
+</code></pre>
+<p>接下来就是创建用户了:</p>
+<pre><code>./manage.py user create 用户名 邮箱
+</code></pre>
+<p>Okay,启动服务器吧!<br>
+目前有两种启动方式,一种是调试,也就是用py跑flask,另外一种是用gunicorn.</p>
+<pre><code>./kcsrv.py
+./start.sh //gunicorn
+</code></pre>
+<p>最后是把flask的5000代理到80（因为flash）:</p>
+<pre><code>sudo ssh $USER@localhost -L 80:localhost:5000 -N
+</code></pre>
+<p>注:你也可以把flask端口改到80…然而我不推荐.</p>
+<p>打开浏览器,Enjoy！</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/46/" class="prev">上一篇</a><a href="/archives/36/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/39/';
+var disqus_title = '搭建一个舰娘私服-Kcsrv';
+var disqus_url = 'https://oao.moe/archives/39/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

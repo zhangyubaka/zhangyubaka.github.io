@@ -1,0 +1,49 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/418/"><title>Digital Ocean 安装 Arch Linux · 云羽的羽毛</title>            <meta name="description" content="当然先分区这是不可能的所以先要创建一个工作文件夹,随便你叫就行,里面放置的就是 OSROOT.;DO 把 Arch 砍了,也没法上传镜像,I’m angry!;让我们开始吧.这里是 REPO 的地址">
+            <meta name="keywords" content="quot,然后,grub,我们,OSROOT,分区,gentoo,里面,amp,作者">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Digital Ocean 安装 Arch Linux</h1><div class="post-info">Apr 27, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>DO 把 Arch 砍了,也没法上传镜像,I’m angry!</p>
+<p>然后呢,有个猛男写了个脚本来安装,也是真实的不行.</p>
+<p>让我们开始吧.这里是 <a href="https://github.com/gh2o/digitalocean-debian-to-arch" rel="external nofollow noopener noreferrer" target="_blank">REPO</a> 的地址</p>
+<p>请先创建一个 Debian 8 的 Droplet.然后执行以下命令,没了. PS:作者表示 Debian 8 不需要 kexec hack,所以很简单</p>
+<pre><code>wget https://raw.githubusercontent.com/gh2o/digitalocean-debian-to-arch/debian8/install.sh &amp;&amp; bash install.sh
+</code></pre>
+<p>没了.</p>
+<p>…</p>
+<p>…</p>
+<p>…</p>
+<p>什么你还在看?好吧.事实上我们不只可以用这个方法安装 Arch Linux,理论上所有提供 Bootstrap/Stage 3 的系统.</p>
+<p>根据作者的的解释,我们可以装个 Gentoo.</p>
+<p>首先分 2 个区,OSROOT,用来存 rootfs,BIOSBOOT,用来当 /boot 分区.</p>
+<p>当然先分区这是不可能的…所以先要创建一个工作文件夹,随便你叫就行,里面放置的就是 OSROOT.</p>
+<p>然后我们把 Stage 3 解压到 OSROOT 里面,chroot 进去 安装必要的包,内核,进行必要配置.</p>
+<pre><code>#先挂载分区 Chroot 进去
+emerge-websync
+eselect profile list
+eselect profile set      //这里选择 Systemd 的.
+emerge -a gentoo-sources genkernel-next grub
+genkernel all
+emerge -auvND @world
+passwd root  
+</code></pre>
+<p>接触挂载之后我们直接切换 init 过去.</p>
+<pre><code>systemctl switch-root /gentoo /init    //注意名字
+</code></pre>
+<p>然后现在把分区分好,原本的分区先缩小.</p>
+<pre><code>blockdev --rereadpt /dev/vda
+</code></pre>
+<p>安装 grub</p>
+<pre><code>grub2-install /dev/vda
+grub2-mkconfig -o /boot/grub/grub.cfg
+</code></pre>
+<p>请重启.</p>
+<p>然后就能 rsync 过来了.</p>
+<pre><code>rsync -aAXv --exclude={&quot;/dev/*&quot;,&quot;/proc/*&quot;,&quot;/sys/*&quot;,&quot;/tmp/*&quot;,&quot;/run/*&quot;,&quot;/mnt/*&quot;,&quot;/media/*&quot;,&quot;/lost+found&quot;} / /gentoo
+</code></pre>
+<p>DO 服务懒得弄(你没救了</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/460/" class="prev">上一篇</a><a href="/archives/454/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/418/';
+var disqus_title = 'Digital Ocean 安装 Arch Linux';
+var disqus_url = 'https://oao.moe/archives/418/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

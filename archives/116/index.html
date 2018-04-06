@@ -1,0 +1,194 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/116/"><title>安装Gentoo教程 · 云羽的羽毛</title>            <meta name="description" content="UEFI用户请把kerne转换为efi;从几个月前接触Arch和Genoo,也是断断续续地折腾了很久,这中间Genoo官网还改版了笑,也有了新的Handbook,总算不是很久以前那古老的界面了.这里也是个人的记录和经验,以供参考.;首先是分区,可以用Gpared和cfdisk大多数人都会吧.如果是UEFI系统的话请分一个大于512M的分区用来做/boo">
+            <meta name="keywords" content="emerge,gentoo,mnt,sys,quot,ask,boot,dev,net,make">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">安装Gentoo教程</h1><div class="post-info">Oct 4, 2015</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>从几个月前接触Arch和Gentoo,也是断断续续地折腾了很久,这中间Gentoo官网还改版了（笑,也有了新的Handbook,总算不是很久以前那古老的界面了.这里也是个人的记录和经验,以供参考.</p>
+<a id="more"></a>
+<p><strong>首先你需要认清楚,你需要安装一个GPT+UEFI的系统还是MBR的系统,以及你需要用Gentoo做什么.</strong></p>
+<p>首先是分区,可以用Gparted和cfdisk…大多数人都会吧.<strong>如果是UEFI系统的话请分一个大于512M的分区用来做/boot</strong></p>
+<p>把你的/ /boot /home等分区挂载到/mnt/gentoo上.</p>
+<p>首先找一个mirror下载stage3,这个没有任何难度.<a href="http://gentoo.osuosl.org/releases/" rel="external nofollow noopener noreferrer" target="_blank">http://gentoo.osuosl.org/releases/</a> 在这里找到你的平台下载stage3,并且把它丢到/mnt/gentoo下面.</p>
+<pre><code>tar xvjpf stage3-*.tar.bz2 --xattrs
+</code></pre>
+<p>首先我们先对Gentoo的make.conf进行更改</p>
+<pre><code>nano -w /mnt/gentoo/etc/portage/make.conf
+</code></pre>
+<p>首先修改<strong>CFLAGS</strong></p>
+<pre><code>CFLAGS=&quot;-march=native -O2 -pipe&quot;
+</code></pre>
+<p>之后是添加<strong>MAKEOPTS</strong></p>
+<pre><code>MAKEOPTS=&quot;-j2&quot;
+</code></pre>
+<p>这是的j数取决于你的核心数,应该是核心数+1<br>
+解压stage3后就是挂载磁盘了,</p>
+<pre><code>mount -t proc proc /mnt/gentoo/proc
+mount --rbind /sys /mnt/gentoo/sys
+mount --make-rslave /mnt/gentoo/sys
+mount --rbind /dev /mnt/gentoo/dev
+mount --make-rslave /mnt/gentoo/dev
+</code></pre>
+<p>之后是Chroot</p>
+<pre><code>chroot /mnt/gentoo /bin/bash
+source /etc/profile
+</code></pre>
+<p>安装portage</p>
+<pre><code>emerge-websync
+emerge --sync
+</code></pre>
+<p>安装完毕之后调整locale 时区和profile以及USE Flag.</p>
+<pre><code>echo &quot;America/Chicago&quot; &gt; /etc/timezone //中国的话调整为Asia/Shanghai
+emerge --config sys-libs/timezone-data
+nano -w /etc/locale.gen //调整你的locale
+locale-gen
+eselect locale list //这里会列出你的locale列表
+eselect locale set //按照list里的数字调整
+eselect profile list
+eselect profile set //选择你的profile,比如我会选择Hardened(误
+nano -w /etc/portage/make.conf //调整USE flag
+添加:
+USE=&quot;....&quot; //USE flag中-XXX代表不需要什么什么,相反则是需要编译
+</code></pre>
+<p>更新环境</p>
+<pre><code>env-update
+source /etc/profile
+</code></pre>
+<p>调整好开始编译内核<br>
+首先安装内核源码:</p>
+<pre><code>emerge --ask sys-kernel/gentoo-sources
+cd /usr/src/linux
+</code></pre>
+<p>之后调整fstab:</p>
+<pre><code>/dev/sda1   /boot        vfat    defaults,noatime     0 2
+/dev/sda2   /            ext4    noatime              0 0
+/dev/sda3   none         swap    sw                   0 1
+/dev/cdrom  /mnt/cdrom   auto    noauto,user          0 0
+</code></pre>
+<p>按照自己电脑实际调整<br>
+如果你是个<strong>高级用户</strong>并且想要<strong>装逼</strong>,那么不要犹豫,手动编译内核吧！</p>
+<pre><code>make menuconfig
+make -j5
+make modules_install -j5
+make install
+</code></pre>
+<p>否则还是用Genkernel吧.<strong>注:Systemd用户请使用Genkernel-next</strong></p>
+<pre><code>emerge -a genkernel
+emerge -a genkernel-next //systemd用户
+</code></pre>
+<p>使用Genkernel来编译内核</p>
+<pre><code>genkernel --menuconfig all //使用 menuconfig 最后检查    
+</code></pre>
+<p><strong>UEFI用户请把kernel转换为efi</strong></p>
+<pre><code>cp /boot/vmlinuz-* /boot/efi/boot/bootx64.efi
+</code></pre>
+<p>如果你不是Genkernel的话也许你需要一个Firmware:</p>
+<pre><code>emerge --ask sys-kernel/linux-firmware
+</code></pre>
+<p>更新/重构软件包:</p>
+<pre><code>emerge -auvND @world
+</code></pre>
+<p>接下来就是进行一些小调整: <strong>注:这是对于OpenRC的</strong></p>
+<pre><code>nano -w /etc/conf.d/hostname
+# 设置主机名
+hostname=&quot;tux&quot;
+</code></pre>
+<p>Systemd使用hostnamectl即可</p>
+<p>然后是网络设置:<br>
+使用有线连接,dhcp的:</p>
+<pre><code>emerge --ask --noreplace net-misc/netifrc
+emerge -a dhcpcd
+emerge -a sys-apps/iproute2 net-tools
+rc-update add dhcpcd default
+emerge --ask net-dialup/ppp //PPPoe拨号网络
+systemctl enable dhcpcd //systemd用户
+</code></pre>
+<p>无线网络:<br>
+<strong>OpenRC</strong></p>
+<pre><code>euse -p net-misc/networkmanager -D dhcpcd
+euse -p net-misc/networkmanager -E dhclient //将dhcpcd更换为dhclient以获得更好的兼容性
+for service in $(rc-update show default | grep 'net\.' | awk '{ print $1 }'); do rc-update del $service default; done //关闭现有的网络管理服务
+rc-update add NetworkManager default
+rc-update del dhcpcd default
+/etc/init.d/NetworkManager start
+euse -E networkmanager
+emerge -auvND @world
+emerge -a nmcli //NetworkManager的Cli工具,如果你是桌面环境就不需要（
+emerge -a sys-apps/iproute2 net-tools
+</code></pre>
+<p><strong>Systemd</strong></p>
+<pre><code>emerge -a netctl
+</code></pre>
+<p>添加一些小工具:</p>
+<pre><code>emerge --ask app-admin/syslog-ng //log
+emerge --ask sys-process/cronie //cron精灵/daemon
+emerge --ask mlocate //locate工具
+</code></pre>
+<p>之后使用rc-update/systemctl将他们添加到开机启动</p>
+<pre><code>rc-update add syslog-ng default
+rc-update add cronie default
+rc-update add sshd default
+
+systemctl enable syslog-ng
+systemctl enable cronie
+systemctl enable sshd
+</code></pre>
+<p>然后是显卡驱动:<br>
+在make.conf里面添加:</p>
+<pre><code>INPUT_DEVICES=&quot;evdev synaptics&quot; //添加鼠标触摸板键盘
+## (N卡)
+VIDEO_CARDS=&quot;nvidia&quot;
+## (A卡)
+VIDEO_CARDS=&quot;radeon&quot;
+
+emerge --ask --verbose x11-base/xorg-drivers //装X（误
+emerge --ask x11-base/xorg-server
+emerge -auvND @world
+</code></pre>
+<p>然后就是写配置文件:<br>
+<strong>N卡</strong></p>
+<pre><code>nvidia-xconfig
+eselect opengl set nvidia
+</code></pre>
+<p><strong>A卡</strong></p>
+<pre><code>X -configure
+eselect opengl set ati
+</code></pre>
+<p>然后就是把你的DM加入启动列表了,这里用的例子是SDDM（KDE5/Plasma）:</p>
+<pre><code>rc-update add sddm boot
+systemctl enable sddm //systemd
+</code></pre>
+<p>其他的自行替换/Google.</p>
+<p>Okay,恭喜你,接下来就是最后一步了,安装bootloader.<br>
+<strong>UEFI用户:</strong></p>
+<pre><code>echo GRUB_PLATFORMS=&quot;efi-64&quot; &amp;gt;&amp;gt; /etc/portage/make.conf
+emerge --ask sys-boot/grub
+emerge -auvND @world //保险起见
+</code></pre>
+<p>普通用户只需要安装grub就好(</p>
+<pre><code>emerge --ask sys-boot/grub
+</code></pre>
+<p>将Grub安装到硬盘上:</p>
+<pre><code>grub2-install /dev/sda
+grub2-install --target=x86_64-efi --efi-directory=/boot //UEFI
+</code></pre>
+<p>生成配置文件:</p>
+<pre><code>grub2-mkconfig -o /boot/grub/grub.cfg
+</code></pre>
+<p>Systemd用户:</p>
+<pre><code>nano -w /boot/grub/grub.cfg
+</code></pre>
+<p>在内核处修改:</p>
+<pre><code>linux /vmlinuz-3.10.9 root=UUID=508868e4-54c6-4e6b-84b0-b3b28b1656b6 init=/usr/lib/systemd/systemd  //举例
+</code></pre>
+<p>OK,万事俱备,就差重启了!</p>
+<pre><code>exit //退出Chroot
+cd /
+umount -l /mnt/gentoo/dev{/shm,/pts,}
+umount /mnt/gentoo{/boot,/sys,/proc,}
+reboot
+</code></pre>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/132/" class="prev">上一篇</a><a href="/archives/111/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/116/';
+var disqus_title = '安装Gentoo教程';
+var disqus_url = 'https://oao.moe/archives/116/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

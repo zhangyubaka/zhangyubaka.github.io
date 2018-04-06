@@ -1,0 +1,77 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/593/"><title>Ebuild 的编写规范 · 云羽的羽毛</title>            <meta name="description" content="同时,版本号中可以包含一个 Genoo 修订revision版本号如 -r1.最初的 Genoo 版本应当没有,而第一个修订版应为 -r1,第二个为 -r2,依此类推.你可以看一下 Ebuid Revision;ebuid 是一个在特殊环境下执行的 bash 脚本,后缀为 .ebuid;名字部分应当只使用英文字母以及数字,下划线,连接符-和加号.强烈不推荐使用大写字母,虽然他们是合乎规则的.">
+            <meta name="keywords" content="ebuild,一个,Tab,字母,版本号,1.2,后缀,名字,空格,表示">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Ebuild 的编写规范</h1><div class="post-info">Jun 19, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p><a href="https://devmanual.gentoo.org/ebuild-writing/file-format/index.html" rel="external nofollow noopener noreferrer" target="_blank">原文</a></p>
+<h2 id="ebuild-的格式"><a class="markdownIt-Anchor" href="#ebuild-的格式"></a> ebuild 的格式</h2>
+<p>ebuild 是一个在特殊环境下执行的 <code>bash</code> 脚本,后缀为 <code>.ebuild</code></p>
+<h2 id="文件命名规则"><a class="markdownIt-Anchor" href="#文件命名规则"></a> 文件命名规则</h2>
+<p>一个 ebuild 应当以 <code>名字-版本.ebuild</code> 的方式命名.</p>
+<p>名字部分应当只使用英文字母以及数字,下划线,连接符<code>-</code>和加号.强烈不推荐使用大写字母,虽然他们是合乎规则的.</p>
+<p>当然,名字是不能以<code>-</code>和<code>+</code>开头的,也不能以<code>-</code>结尾.</p>
+<p>版本号则是有一些复杂,一般来说它是一些被<code>.</code>所分开的数字,例如 <code>1.2.3</code>,<code>20050108</code>.最后一位有可以是个字母,例如 <code>1.2b</code>,当然这个字母不能用来表示 <code>beta</code> ,在 Portage 中,<code>1.2b</code> 比 <code>1.2</code> 和 <code>1.2a</code> 大(新).</p>
+<p>在版本号后可以添加一个后缀(suffix),以用来表示发行版(Release) 状态.这里我们用一个表格来表示.</p>
+<table>
+<thead>
+<tr>
+  <th>后缀</th>
+  <th align="center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>`_alpha`</td>
+  <td align="center">Alpha 发行版(最早)</td>
+</tr>
+<tr>
+  <td>`_beta`</td>
+  <td align="center">Beta 发行版</td>
+</tr>
+<tr>
+  <td>`_pre`</td>
+  <td align="center">预发行版</td>
+</tr>
+<tr>
+  <td>`_rc`</td>
+  <td align="center">最终候选版</td>
+</tr>
+<tr>
+  <td>无</td>
+  <td align="center">普通版本</td>
+</tr>
+<tr>
+  <td>`_p`</td>
+  <td align="center">补丁版本</td>
+</tr>
+</tbody>
+</table>
+<p>这些后缀后可以追加一位非零整数.例如 <code>_alpha3</code></p>
+<p>这些后缀可以一起使用并且将被迭代(iteratively)处理,例如:</p>
+<ul>
+<li>foo-1.0.0_alpha_pre</li>
+<li>foo-1.0.0_alpha_rc1</li>
+<li>foo-1.0.0_beta_pre</li>
+<li>foo-1.0.0_beta_p1</li>
+</ul>
+<p>所有的版本数字都不应超过 18 位.</p>
+<p>同时,版本号中可以包含一个 Gentoo 修订(revision)版本号如 <code>-r1</code>.最初的 Gentoo 版本应当没有,而第一个修订版应为 <code>-r1</code>,第二个为 <code>-r2</code>,依此类推.你可以看一下 <a href="https://devmanual.gentoo.org/general-concepts/ebuild-revisions/index.html" rel="external nofollow noopener noreferrer" target="_blank">Ebuild Revision</a></p>
+<p>总之,最终的文件名应该类似 <code>libfoo-1.2.5b_pre5-r2.ebuild</code></p>
+<h2 id="ebuild-文件头"><a class="markdownIt-Anchor" href="#ebuild-文件头"></a> ebuild 文件头</h2>
+<p>所有收录入 Portage 树(Tree)中的 ebuild 都应拥有三行用来声明版权的文件头.他们必须与 <code>$(portageq get_repo_path / gentoo)/header.txt</code> 完全相同.注意 <code>$id$</code> 行并非需要手动修改,他们会在 staging 阶段自动更改.</p>
+<p>一个例子:</p>
+<pre><code># Copyright 1999-2016 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Id$
+</code></pre>
+<h2 id="缩进与空格"><a class="markdownIt-Anchor" href="#缩进与空格"></a> 缩进与空格</h2>
+<p>所有在 ebuild 中的缩进都应该由 Tab 缩进,每一层一个 Tab,Tab 应只在缩进中使用,永远不要在内文中使用 Tab.</p>
+<p>避免使用一长串的空格,Repo 维护者会在你的 ebuild 内有一长串的空格时警告你(按空格而非 Tab).</p>
+<p>尽可能避免使一行超过 80 位,在这里, ‘位’ 一般等同于一个字符,一个缩进(Tab)为 4 位,多字节字符视为一位.</p>
+<h2 id="编码"><a class="markdownIt-Anchor" href="#编码"></a> 编码</h2>
+<p>所有的 ebuild,包括 eclasses,metadata 文件和 ChangeLogs 必须使用 UTF-8 编码.<a href="https://wiki.gentoo.org/wiki/GLEP:31" rel="external nofollow noopener noreferrer" target="_blank">GLEP 31</a> 中有更多的细节.</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/600/" class="prev">上一篇</a><a href="/archives/591/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/593/';
+var disqus_title = 'Ebuild 的编写规范';
+var disqus_url = 'https://oao.moe/archives/593/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

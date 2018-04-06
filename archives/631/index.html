@@ -1,0 +1,124 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/631/"><title>macOS 上的 Kali 工具 · 云羽的羽毛</title>            <meta name="description" content="然后使用 Homebrew 安装依赖.;目前没心情开个新 VM 跑 Kai,遂打算把 Kai 的工具装到 macOS 上面.;wge hp://downoads.measpoi.com/daa/reeases/measpoi-framework/osx/measpoiframework-aes.pkg">
+            <meta name="keywords" content="clone,git,这个,Homebrew,install,brew,pip,然后,openssl,python">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">macOS 上的 Kali 工具</h1><div class="post-info">Jul 7, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>目前没心情开个新 VM 跑 Kali,遂打算把 Kali 的工具装到 macOS 上面.</p>
+<h2 id="metasploit"><a class="markdownIt-Anchor" href="#metasploit"></a> Metasploit</h2>
+<p>这个蛮简单的,官方有提供 pkg,我们只需要下载下来安装就好.</p>
+<pre><code>wget http://downloads.metasploit.com/data/releases/metasploit-framework/osx/metasploitframework-latest.pkg
+</code></pre>
+<p>他会安装到 <code>/opt/metasploit-framework/</code> 中.</p>
+<p>以后更新只需要执行 <code>msfupdate</code> 即可.</p>
+<h2 id="nmap"><a class="markdownIt-Anchor" href="#nmap"></a> Nmap</h2>
+<p>这个更简单,用 Homebrew 安装就行了.</p>
+<pre><code>brew install nmap
+</code></pre>
+<h2 id="sqlmap"><a class="markdownIt-Anchor" href="#sqlmap"></a> Sqlmap</h2>
+<p>这个也是 Homebrew 安装就成.</p>
+<pre><code>brew install sqlmap
+</code></pre>
+<h2 id="johntheripper"><a class="markdownIt-Anchor" href="#johntheripper"></a> JohnTheRipper</h2>
+<p>JTR 可以用 Homebrew 装,但是装的是没有 CUDA/OpenCL 支持的,所以自己编译.</p>
+<pre><code>git clone https://github.com/magnumripper/JohnTheRipper
+cd JohnTheRipper/src
+./configure --enable-mpi --enable-cuda
+make
+make clean macosx-x86-64
+</code></pre>
+<p>然后测试二进制文件.</p>
+<pre><code>cd ../run
+./john --test
+</code></pre>
+<p>如果你得到了类似的错误:<code>./sha.h:4:10: fatal error: 'openssl/sha.h' file not found</code></p>
+<p>安装 openssl 以及其他库.</p>
+<pre><code>brew install openssl libyaml libffi
+brew link openssl libffi libyaml --force
+</code></pre>
+<p>再次编译即可.</p>
+<h2 id="w3af"><a class="markdownIt-Anchor" href="#w3af"></a> w3af</h2>
+<p>虽然说 w3af 推荐用 MacPorts 安装,不过我们有了 Homebrew 就别装 MacPorts 咯.</p>
+<p>先装个 python 和 pip</p>
+<pre><code>brew install python
+pip install --upgrade pip setuptools
+</code></pre>
+<p>从 Github 上安装.</p>
+<pre><code>git clone https://github.com/andresriancho/w3af.git
+cd w3af
+./w3af_console
+</code></pre>
+<p>然后 w3af 会给出一个安装依赖的命令,复制执行之.</p>
+<pre><code>sudo pip install pyClamd==0.3.15 PyGithub==1.21.0 GitPython==0.3.2.RC1 pybloomfiltermmap==0.3.14 esmre==0.3.1 phply==0.9.1 nltk==3.0.1 chardet==2.1.1 tblib==0.2.0 pdfminer==20140328 futures==2.1.5 pyOpenSSL==0.15.1 ndg-httpsclient==0.3.3 pyasn1==0.1.8 lxml==3.4.4 scapy-real==2.2.0-dev guess-language==0.2 cluster==1.1.1b3 msgpack-python==0.4.4 python-ntlm==1.0.1 halberd==0.2.4 darts.util.lru==0.5 Jinja2==2.7.3 vulndb==0.0.19 markdown==2.6.1 psutil==2.2.1 mitmproxy==0.13 ruamel.ordereddict==0.4.8 Flask==0.10.1 PyYAML==3.11
+</code></pre>
+<p>安装完毕之后,命令行版本就可以用了!</p>
+<pre><code>./w3af_console
+</code></pre>
+<p>至于 GUI 版本,我们需要修改一下他的 <code>w3af/core/ui/gui/scanrun.py</code></p>
+<p>将 <code>import webkit</code> 替换为 <code>import WebKit</code>.</p>
+<p>然后使用 Homebrew 安装依赖.</p>
+<pre><code>brew install webkitgtk pygtksourceview
+</code></pre>
+<p>然后 <code>./w3af_gui</code> 即可,虽然啊,这个 GUI 丑的要死.</p>
+<h2 id="burp-suite"><a class="markdownIt-Anchor" href="#burp-suite"></a> Burp Suite</h2>
+<p>这个没什么说的, Java 写的直接下载就好.</p>
+<pre><code>https://portswigger.net/burp/downloadfree.html
+</code></pre>
+<p>去这里下载一个就好啦.</p>
+<h2 id="nessus"><a class="markdownIt-Anchor" href="#nessus"></a> Nessus</h2>
+<p>这个也是下载就好.</p>
+<pre><code>http://www.tenable.com/products/nessus/select-your-operating-system#tos
+</code></pre>
+<p>用 DMG 安装即可.</p>
+<h2 id="nikto"><a class="markdownIt-Anchor" href="#nikto"></a> Nikto</h2>
+<p>这个也是有 Homebrew 打包的!安装即可.</p>
+<pre><code>brew install nikto
+</code></pre>
+<p>就可以啦.</p>
+<h2 id="无线工具"><a class="markdownIt-Anchor" href="#无线工具"></a> 无线工具</h2>
+<p>首先的话,先把能装的都装了.</p>
+<pre><code>brew install aircrack-ng reaver tcpdump
+brew cask install wireshark
+</code></pre>
+<p>然后抓包就是需要手动来了…<a href="https://oao.moe/%E6%8A%93-wpa2-%E6%8F%A1%E6%89%8B/">传送门</a></p>
+<h2 id="setookit"><a class="markdownIt-Anchor" href="#setookit"></a> SETookit</h2>
+<p>这个也就是大名鼎鼎的 SET 了!</p>
+<p>安装的话跟 w3af 差不多.</p>
+<pre><code>git clone https://github.com/trustedsec/social-engineer-toolkit/
+cd social-engineer-toolkit
+sudo ./setup.py
+</code></pre>
+<p>之后就是设定他和 MSF 协作了.</p>
+<pre><code>sudo vim /etc/setoolkit/set.config
+</code></pre>
+<p>将 <code>METASPLOIT_PATH</code> 修改到 MSF 的位置.</p>
+<pre><code>METASPLOIT_PATH=/opt/metasploit-framework/bin
+</code></pre>
+<p>然后就可以使用了.</p>
+<pre><code>sudo ./setoolkit
+</code></pre>
+<h2 id="whatweb"><a class="markdownIt-Anchor" href="#whatweb"></a> WhatWeb</h2>
+<p>这个呢,也是非常简单.从 Github 拖就好了.</p>
+<pre><code>git clone https://github.com/urbanadventurer/WhatWeb
+</code></pre>
+<p>这样就可以啦~</p>
+<h2 id="wpscan"><a class="markdownIt-Anchor" href="#wpscan"></a> WPScan</h2>
+<p>同上.</p>
+<pre><code>git clone https://github.com/wpscanteam/wpscan
+</code></pre>
+<p>好啦.</p>
+<h2 id="wfuzz"><a class="markdownIt-Anchor" href="#wfuzz"></a> Wfuzz</h2>
+<p>还是如此.</p>
+<pre><code>git clone https://github.com/xmendez/wfuzz
+</code></pre>
+<h2 id="一些其他的工具"><a class="markdownIt-Anchor" href="#一些其他的工具"></a> 一些其他的工具</h2>
+<pre><code>brew install hydra hping dnsmap amap masscan binwalk dc3dd sslyze ncrack ipv6toolkit
+git clone https://github.com/PenturaLabs/Linux_Exploit_Suggester
+git clone https://github.com/reyammer/shellnoob
+</code></pre>
+<p>还有 <a href="https://sourceforge.net/projects/uniscan/" rel="external nofollow noopener noreferrer" target="_blank">Uniscan</a></p>
+<p>目前就这样吧,Happy Hacking!</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/641/" class="prev">上一篇</a><a href="/archives/627/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/631/';
+var disqus_title = 'macOS 上的 Kali 工具';
+var disqus_url = 'https://oao.moe/archives/631/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

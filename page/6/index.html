@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/page/6/"><title>云羽的羽毛</title><!--| !{ auto_keyword_desc(page.content) }--><meta name="description" content="羽毛的博客"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><ul class="home post-list"><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/840/" class="post-title-link">Mimikatz</a></h2><div class="post-info">Dec 22, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="mimikatz"><a class="markdownIt-Anchor" href="#mimikatz"></a> Mimikatz</h1>
+<p>Mimikatz 是一个用来与 lsass.exe 进程沟通的小工具, 一般来说是用来提取 credentials.</p>
+<p>首先提权:</p>
+<pre><code>mimikatz # privilege::debug
+Privilege '20' OK
+</code></pre></div><a href="/archives/840/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/834/" class="post-title-link">星星</a></h2><div class="post-info">Dec 9, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="星星"><a class="markdownIt-Anchor" href="#星星"></a> 星星</h1>
+<p>在美国的时候， 常常晚上不睡觉在看星星。 自从回到了国内似乎已经很久没有看到星星了， 不论是天气亦或是时间都没有可能性。</p>
+<p>于是上周抽出了周五和周六， 去了一次滴水湖。</p>
+<p>十六号线一路走到底， 周围的环境逐渐变得荒凉， 毕竟已经出了市区了， 郊区也就是这样的呀。 到了滴水湖附近后先是去了岛上的公园， 夜时的公园内空无一人， 抬头就是星空。 看向湖边则是不息的灯火， 还有黑暗的岛上。</p></div><a href="/archives/834/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/818/" class="post-title-link">Livepatch</a></h2><div class="post-info">Nov 21, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="livepatch"><a class="markdownIt-Anchor" href="#livepatch"></a> Livepatch</h1>
+<p>这是 Ubuntu 的 snap 黑科技, 可以不重启更新内核.</p>
+<p>启用黑简单, 首先去 <a href="https://ubuntu.com/livepatch" rel="external nofollow noopener noreferrer" target="_blank">https://ubuntu.com/livepatch</a> 申请一个 Token .</p>
+<p>Token 是一个 32 位的字符串, 到手之后就可以配置了.</p></div><a href="/archives/818/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/812/" class="post-title-link">fallocate 与 dd</a></h2><div class="post-info">Nov 20, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="fallocate-与-dd"><a class="markdownIt-Anchor" href="#fallocate-与-dd"></a> fallocate 与 dd</h1>
+<p>这两个命令都可以创建文件, 尤其是大文件.那么都有什么区别呢?</p>
+<p>其中很多人都注意到 dd 慢一点.</p>
+<pre><code>➜  ~ time fallocate -l 1G 1G
+fallocate -l 1G 1G  0.00s user 0.00s system 0% cpu 0.006 total
+
+➜  ~ time dd if=/dev/zero of=1G bs=128M count=8
+8+0 records in
+8+0 records out
+1073741824 bytes (1.1 GB, 1.0 GiB) copied, 2.45113 s, 438 MB/s
+dd if=/dev/zero of=1G bs=128M count=8  0.00s user 1.15s system 46% cpu 2.456 total
+</code></pre></div><a href="/archives/812/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/809/" class="post-title-link">获得免费 SSL 证书</a></h2><div class="post-info">Nov 18, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="获得免费-ssl-证书"><a class="markdownIt-Anchor" href="#获得免费-ssl-证书"></a> 获得免费 SSL 证书</h1>
+<p>并不只是 HTTPS 需要证书, 例如 Anyconnect 也需要证书, 那么怎么拿呢?</p>
+<p>以前我在用 StartSSL, 但目前 StartCOM 有些问题, 所以来用 Let’s Encrypt 吧.</p>
+<p>首先 clone 下来.</p></div><a href="/archives/809/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/806/" class="post-title-link">自由的命运</a></h2><div class="post-info">Nov 15, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="自由的命运"><a class="markdownIt-Anchor" href="#自由的命运"></a> 自由的命运</h1>
+<p>人人享有言论和信仰自由并免予恐惧和匮乏,而绝对的自由,无尽自由,将会导向未知吧.没有人可以主导他人,没有人可以主导方向.自我将完全释放,尽个人之力操控自己.你要做一个奴隶,即使家财万贯;还是做一个征服者,即使被诬为恶魔?在无尽自由存在的同时,秩序行将就木,只余个人意志.</p>
+<p>这大概,又是一个反乌托邦吧?</p>
+<p>和平是谎言,平等是背叛.民主从来是诡计榨取的火液,规矩更是欺骗中流出的毒汁.</p></div><a href="/archives/806/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/802/" class="post-title-link">求生求死</a></h2><div class="post-info">Nov 1, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="求生求死"><a class="markdownIt-Anchor" href="#求生求死"></a> 求生求死</h1>
+<p>人的本能便会求生,自身所求,生存延续.只是,人各有志吧.并不是想要活得更久,而只是恐惧痛苦.</p>
+<p>而活下去呢?为了幸福的活着么?不是吧,大概只是不甘心,还有事情没有完成,还有疑问没有解决,不甘心就这样结束吧,大概.</p>
+<p>只是,真的值得么?若是不值得,那就不会继续坚持了.有些东西,一丝的可能,大概不值得去追寻,因为结果心中早已猜到了吧.</p></div><a href="/archives/802/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/800/" class="post-title-link">干掉 DeepFreeze</a></h2><div class="post-info">Oct 26, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>学校机房电脑上面装了 Deep Freeze 7,好烦啊,还有密码,只能手动删除了.</p>
+<p>首先重启到 BIOS,把时间调到十年后,开机进入安全模式.</p>
+<p>然后打开任务管理器,结束 “DFServ.exe” 和 “FrzState2K.exe” 这两个进程,删除 “C:\Program Files\Faronics*”</p>
+<p>然后打开注册表编辑器.请做好备份.</p></div><a href="/archives/800/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/789/" class="post-title-link">重装 CLT</a></h2><div class="post-info">Oct 1, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>更新了 Xcode 8.0 之后不知道为什么 App Store 同时推送了两个 Command Line Tools,一个是 Xcode 8.0 的,还有个 Xcode 7.3 的.</p>
+<p>我:???</p>
+<p>那么就重装吧.</p>
+<pre><code>sudo rm -rf /Library/Developer/CommandLineTools/
+xcode-select --install
+</code></pre></div><a href="/archives/789/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/archives/795/" class="post-title-link">nmap</a></h2><div class="post-info">Sep 30, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="nmap"><a class="markdownIt-Anchor" href="#nmap"></a> Nmap</h1>
+<h3 id="基础扫描"><a class="markdownIt-Anchor" href="#基础扫描"></a> 基础扫描</h3>
+<pre><code>nmap ip
+nmap -p port ip
+#只扫描指定端口
+</code></pre>
+<h3 id="ping-扫描"><a class="markdownIt-Anchor" href="#ping-扫描"></a> Ping 扫描</h3></div><a href="/archives/795/" class="read-more">...阅读全文</a></article></li></ul></main><footer><div class="paginator"><a href="/page/5/" class="prev">上一页</a><a href="/page/7/" class="next">下一页</a></div><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

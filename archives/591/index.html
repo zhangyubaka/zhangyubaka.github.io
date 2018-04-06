@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/591/"><title>进入 i-240e-q 的内部 · 云羽的羽毛</title>            <meta name="description" content="经过试验发现不是 nix 的 she,于是敲了一个 enabe.结果变成了;家里有个光猫,型号 i-240e-q,结果发现这劳什子 4 个 eh 就一个能用,我好怒啊,于是打算看看这东西有没有管理员界面.;等了一会发现这东西没 DHCP,hmm,这没法阻止我!">
+            <meta name="keywords" content="发现,于是,html,一个,root,busybox,管理员,路由,电脑,一下">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">进入 i-240e-q 的内部</h1><div class="post-info">Jun 18, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>家里有个光猫,型号 i-240e-q,结果发现这劳什子 4 个 eth 就一个能用,我好怒啊,于是打算看看这东西有没有管理员界面.</p>
+<p>目前他是桥接模式,用我的路由来拨号,于是断开连接路由的线,接到电脑上.</p>
+<p>等了一会发现这东西没 DHCP,hmm,这没法阻止我!</p>
+<p>手动分配 192.168.1.2,nmap 扫了一下,192.168.1.251 有回复,哈!</p>
+<p>telnet 上去之后用 root:admin 登陆,发现是个奇怪的提示符</p>
+<pre><code>ONT&gt;
+</code></pre>
+<p>经过试验发现不是 *nix 的 shell,于是敲了一个 enable.结果变成了</p>
+<pre><code>#ONT&gt;
+</code></pre>
+<p>这是不是有 root 了权限呢?于是敲 help,发现有 traffic 和 system 两个选项,敲入 system,help.</p>
+<pre><code>...
+env
+manufacturer
+mid
+misc
+shell
+...
+</code></pre>
+<p>哈!shell!</p>
+<p>敲入 shell,就进入了熟悉的 Linux 环境,稍微看了一下,armv5te,Linux-2.6.32.11 内核,内置了 busybox telnetd 和 dropbear,可惜 dropbear 没法连上,不过有 busybox,没问题!</p>
+<p>…</p>
+<p>然后我发现 busybox 里面没有 nc,真是日了🐶了.</p>
+<p>于是 dd dump 出来了 mtdblock,然后 tftp 推到电脑上,总大小在 63m 左右,大概是个 64m 的 nand 吧,另外它内置了一个 nanddump,不过不敢用.</p>
+<p>看了下 web 目录,发现里面有 firewall.html,wifi.html,tr069.html 等等,访问的话也是 root:admin,不过左边只能更改 slid 和 loid,我猜还是有个更高级的管理员.</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/593/" class="prev">上一篇</a><a href="/archives/588/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/591/';
+var disqus_title = '进入 i-240e-q 的内部';
+var disqus_url = 'https://oao.moe/archives/591/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

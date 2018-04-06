@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/558/"><title>花式跑 hash · 云羽的羽毛</title>            <meta name="description" content="hashca -m num -a num -1 hash.x -o resu.x;最近抓到一堆的 hash, 那么自然要想办法把它们跑出来咯.;这东西 kai 里面有自带, 然后大多数包管理器里面也都有, 也是可以直接装">
+            <meta name="keywords" content="hash,charset,john,里面,num,txt,就是,force,quot,这个">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">花式跑 hash</h1><div class="post-info">May 22, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>最近抓到一堆的 hash, 那么自然要想办法把它们跑出来咯.</p>
+<p><strong>JTR</strong></p>
+<p>首先自然老生常谈的 john, 或者 jtr,john the ripper.</p>
+<p>这东西 kali 里面有自带, 然后大多数包管理器里面也都有, 也是可以直接装. 问题是, 他们不带 cuda/opencl 支持… 所以就编译一个吧.</p>
+<p>这里我们使用 jtr 的社区版, john-jumbo.</p>
+<pre><code>wget https://github.com/magnumripper/JohnTheRipper/archive/bleeding-jumbo.zip
+unzip bleeding-jumbo.zip
+cd JohnTheRipper-bleeding-jumbo/src
+./configure
+</code></pre>
+<p>这里注意看输出, 有没有类似 OpenCL:yes CUDA:yes 的字样, 若有就意味成功检测到了驱动 / 库, 如果没有就重新装驱动吧.</p>
+<pre><code>make clean &amp;&amp; make -sj
+</code></pre>
+<p>我们编译之. 完成之后就可以破解了, 简单.</p>
+<pre><code>../run/john hash.txt
+</code></pre>
+<p><strong>Hashcat</strong></p>
+<p>Hashcat, 他们标榜说自己是最快的… 实际上我也不知道.</p>
+<p>这个倒是不需要编译了, 直接装就行.</p>
+<pre><code>hashcat -m num -a num -1 hash.txt -o result.txt
+</code></pre>
+<p>这个具体问题就是必须指定 hash 类型, 攻击模式的话就那么几种, 最无脑的就是 brute-force.</p>
+<pre><code>hashcat -m num -a 3 hash.txt &quot;?l&quot;    #使用内置的 charset
+</code></pre>
+<p>具体类型的话在 -h 里面有.</p>
+<pre><code>Brute-force 就是根据给出的 charset 来破解.
+
+Mask 则是根据一个规律来组合的 brute-force.
+
+Straight 和 Combination 都是需要字典的,S 是直接过字典,而 C 会再次组合.
+
+自定义 charset 的话则是 -1 -2 -3 -4 后面加上 charset.
+
+#eg
+-1 abcdefghijklmnopqrstuvwxyz0123456789    #a-z 0-9
+-1 loweralpha_numeric.hcchr    #等同
+-1 ?dabcdef    #0123456789abcdef
+-1 ?l?d?s?u    #abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&amp;*()-_+=~`[]{}|\:;&quot;'&lt;&gt;;,.?/ 
+</code></pre>
+<p>PS:可以跑包(</p>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/561/" class="prev">上一篇</a><a href="/archives/549/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/558/';
+var disqus_title = '花式跑 hash';
+var disqus_url = 'https://oao.moe/archives/558/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>

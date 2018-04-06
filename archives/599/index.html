@@ -1,0 +1,22 @@
+<!DOCTYPE html><html lang="zh-Hans-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="theme-color" content="#db3333"><link rel="canonical" href="https://oao.moe/archives/599/"><title>改回 eth 的命名规则 · 云羽的羽毛</title>            <meta name="description" content="udev 197 之后,对于 inerface 的命名规则就变了.;对于板载设备,使用 eno 之类的名字.然后我的 VMware 里面就有了个 eno6666666667.;对于在 PCI-Express 上的设备,使用 enp,例如 enp6.同时根据他的位置,插槽来顺延,例如 enp6s0,wp7s0.">
+            <meta name="keywords" content="grub,enp,设备,eno,名字,然后,GRUB,quot,78,interface">        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://oao.moe/atom.xml" title="云羽的羽毛"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link active">ARCHIVES</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="/links/" target="_self" class="nav-list-link">LINKS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">改回 eth 的命名规则</h1><div class="post-info">Aug 25, 2016</div><div class="post-content"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>udev 197 之后,对于 interface 的命名规则就变了.</p>
+<p>对于板载设备,使用 eno 之类的名字.然后我的 VMware 里面就有了个 eno6666666667.</p>
+<p>对于在 PCI-Express 上的设备,使用 enp,例如 enp6.同时根据他的位置,插槽来顺延,例如 enp6s0,wlp7s0.</p>
+<p>或者使用 mac 地址来命名,比如 enx78e7d1ea46da.</p>
+<p>问题就是,我还是喜欢 eth,wlan 这类的名字啊!!!</p>
+<p>那么就改回来吧,首先修改 <code>/etc/default/grub</code>.</p>
+<pre><code>GRUB_CMDLINE_LINUX=&quot;...net.ifnames=0 biosdevname=0&quot;
+</code></pre>
+<p>添加以上两行,然后更新 GRUB2 配置.</p>
+<pre><code>upgrade-grub2
+grub-mkconfig -o /boot/grub/grub.cfg   #Gentoo/Arch Linux
+</code></pre>
+<br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/748/" class="prev">上一篇</a><a href="/archives/746/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
+var disqus_identifier = 'archives/599/';
+var disqus_title = '改回 eth 的命名规则';
+var disqus_url = 'https://oao.moe/archives/599/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//kumowa.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2018 <a href="https://oao.moe">zhangyubaka</a>, with <a href="http://www.vultr.com/?ref=6853828" target="_blank" rel="external nofollow noopener noreferrer">Vultr</a>, powered by <a href="https://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank" rel="external nofollow noopener noreferrer">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
