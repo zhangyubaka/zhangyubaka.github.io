@@ -4,7 +4,7 @@
 <p>在下的路由的固件比较老了,用的还是 radvd 来广播,新的固件中 odhcpd 会直接广播.</p>
 <p>首先,选择 wan6,协议选择 IPv6-in-IPv4,你可能需要安装 6in4, <code>opkg install 6in4</code>.</p>
 <p>切换协议之后你看到的大概是这样.</p>
-<p><a href="https://oao.moe/wp-content/uploads/2016/06/%E6%97%A0%E6%A0%87%E9%A2%98.png" rel="external nofollow noopener noreferrer" target="_blank"><img src="https://oao.moe/wp-content/uploads/2016/06/%E6%97%A0%E6%A0%87%E9%A2%98-300x169.png" alt="无标题"></a></p>
+<p><a href="https://zhangyubaka.github.io/images/wp-content/uploads/2016/06/%E6%97%A0%E6%A0%87%E9%A2%98.png" rel="external nofollow noopener noreferrer" target="_blank"><img src="https://zhangyubaka.github.io/images/wp-content/uploads/2016/06/%E6%97%A0%E6%A0%87%E9%A2%98-300x169.png" alt="无标题"></a></p>
 <p>其中,本地 IPv4 地址留空就好了,本地 IPv6 地址则填入 Client IPv6 Address: 后面的那个,远程 IPv4 地址填 Server IPv4 Address,很明显,很简单.IPv6 routed prefix 则是 Routed IPv6 Prefixes 下面的,填 /64 或 /48 随你便咯.</p>
 <p>然后保存,连接一下试一试,是不是可以了?</p>
 <p>然后呢,配置一个 crontab 来更新你的 ip 地址,因为 Luci 上面那个不知道为什么不能用.</p>
@@ -13,11 +13,11 @@ wget -q -O &quot;http://username:Update Key@ipv4.tunnelbroker.net/nic/update?hos
 </code></pre>
 <p>后面那个链接在 HE 的界面中的 Advanced 区有, Example Update URL 那里,抄下来就好了.</p>
 <p>还有个问题是分配 ipv6 地址,如果你是最新版的,那就没什么问题,老版的话则是配置一下 radvd,在 Luci 设置一下就好了.</p>
-<p><a href="https://oao.moe/wp-content/uploads/2016/06/%E6%97%A0%E6%A0%87%E9%A2%98-1.png" rel="external nofollow noopener noreferrer" target="_blank"><img src="https://oao.moe/wp-content/uploads/2016/06/%E6%97%A0%E6%A0%87%E9%A2%98-1-300x127.png" alt="无标题"></a></p>
+<p><a href="https://zhangyubaka.github.io/images/wp-content/uploads/2016/06/%E6%97%A0%E6%A0%87%E9%A2%98-1.png" rel="external nofollow noopener noreferrer" target="_blank"><img src="https://zhangyubaka.github.io/images/wp-content/uploads/2016/06/%E6%97%A0%E6%A0%87%E9%A2%98-1-300x127.png" alt="无标题"></a></p>
 <br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/608/" class="prev">上一篇</a><a href="/archives/593/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
 var disqus_identifier = 'archives/600/';
 var disqus_title = '6in4 隧道在 OpenWRT 上的配置';
-var disqus_url = 'https://zhangyubaka.github.io/archives/600/';
+var disqus_url = 'https://oao.moe/archives/600/';
 (function() {
     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
     dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';

@@ -29,7 +29,7 @@
 </code></pre>
 <p>Make sure you have some space left on drive,otherwise,this may fail.</p>
 <p>Now let’s focus on CFLAGS and other flags in make.conf,first we need find proper -march and -mtune.</p>
-<p>As I mentioned in this <a href="https://oao.moe/archives/613" rel="external nofollow noopener noreferrer" target="_blank">blog </a>,use following command to obtain them.</p>
+<p>As I mentioned in this <a href="https://zhangyubaka.github.io/archives/613" rel="external nofollow noopener noreferrer" target="_blank">blog </a>,use following command to obtain them.</p>
 <pre><code>gcc -v -E -x c -march=native -mtune=native - &lt; /dev/null 2&gt;&amp;1 | grep cc1 | perl -pe 's/ -mno-\S+//g; s/^.* - //g;'
 </code></pre>
 <p>This should produce a line of CFLAGS.But we only need -march and -mtune,add/modify them in make.conf.</p>
@@ -40,7 +40,7 @@
 <br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/631/" class="prev">上一篇</a><a href="/archives/625/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
 var disqus_identifier = 'archives/627/';
 var disqus_title = 'Optimize your Gentoo';
-var disqus_url = 'https://zhangyubaka.github.io/archives/627/';
+var disqus_url = 'https://oao.moe/archives/627/';
 (function() {
     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
     dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
