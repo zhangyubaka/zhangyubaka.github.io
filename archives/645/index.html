@@ -18,7 +18,7 @@ debug1: Requesting X11 forwarding with authentication spoofing.
 </code></pre>
 <p>其中,如果你觉 Y 的信任连接不安全的话,用 -X 就好了.</p>
 <p>现在就可以打开一个 X11 程序看看啦,例如 xterm.</p>
-<pre><code>[CCE7F259-7082-488C-A52F-E88934A94F8F](https://oao.moe/wp-content/uploads/2016/07/CCE7F259-7082-488C-A52F-E88934A94F8F-300x88.jpg)
+<pre><code>[CCE7F259-7082-488C-A52F-E88934A94F8F](https://zhangyubaka.github.io/images/wp-content/uploads/2016/07/CCE7F259-7082-488C-A52F-E88934A94F8F-300x88.jpg)
 </code></pre>
 <p>然后便是其他的问题了,例如我用 sudo 开一个就不行了,发现是 xauth 不对.给 Root 导入你的 auth 就好.</p>
 <pre><code>xauth list | grep unix`echo $DISPLAY | cut -c10-12` &gt; /tmp/tmpauth
@@ -29,7 +29,7 @@ xauth add `cat /tmp/tmpauth`
 <br><blockquote><a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png"></a><br>This work is licensed under a <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</blockquote></div></article></div></main><footer><div class="paginator"><a href="/archives/648/" class="prev">上一篇</a><a href="/archives/641/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'kumowa';
 var disqus_identifier = 'archives/645/';
 var disqus_title = '在 Mac 上接受 X11 Forwarding';
-var disqus_url = 'https://zhangyubaka.github.io/archives/645/';
+var disqus_url = 'https://oao.moe/archives/645/';
 (function() {
     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
     dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
